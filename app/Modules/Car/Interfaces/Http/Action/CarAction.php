@@ -16,10 +16,14 @@ class CarAction
         $this->service = new CarService();
     }
 
+    /**
+     * @param CarRequests $request
+     * @return JsonResponse
+     */
     public function __invoke(CarRequests $request): JsonResponse
     {
         try {
-            $cars = $this->service->listCars();
+            $cars = $this->service->listCars(perPage: $request->input('perPage'));
             return response()->json($cars);
         }catch (Exception $exception){
             return response()->json([$exception->getMessage(), $exception->getCode()], 500);

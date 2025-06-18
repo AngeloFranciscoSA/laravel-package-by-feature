@@ -12,5 +12,5 @@ interface CarRepositoryInterface
 
     public function getCarById(int $id): Car;
 
-    public function getPaginatedCars(int $perPage): Paginator;
+    public function getPaginatedCars(null|int $perPage): Paginator;
 }

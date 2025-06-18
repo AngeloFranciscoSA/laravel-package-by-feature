@@ -16,7 +16,7 @@ class CarService
         $this->repository = new CarRepository();
     }
 
-    public function listCars(int $perPage = 15): Paginator
+    public function listCars(null|int $perPage = 15): Paginator
     {
         return $this->repository->getPaginatedCars($perPage);
     }
