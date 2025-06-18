@@ -2,5 +2,5 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Modules\Car\Providers\CarervicesProvider::class,
+    App\Modules\Car\Providers\CarServicesProvider::class,
 ];
