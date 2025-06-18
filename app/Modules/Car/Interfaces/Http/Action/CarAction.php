@@ -5,7 +5,6 @@ namespace App\Modules\Car\Interfaces\Http\Action;
 use App\Modules\Car\Interfaces\Http\Requests\CarRequests;
 use App\Modules\Car\Services\CarService;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 
 class CarAction
@@ -21,7 +20,7 @@ class CarAction
     {
         try {
             $cars = $this->service->listCars();
-            return response()->json($cars, 200);
+            return response()->json($cars);
         }catch (Exception $exception){
             return response()->json([$exception->getMessage(), $exception->getCode()], 500);
         }

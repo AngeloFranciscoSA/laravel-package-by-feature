@@ -3,6 +3,7 @@
 namespace App\Modules\Car\Services;
 
 use App\Modules\Car\Repositories\CarRepository;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class CarService
@@ -15,7 +16,7 @@ class CarService
         $this->repository = new CarRepository();
     }
 
-    public function listCars(int $perPage = 15): Collection
+    public function listCars(int $perPage = 15): Paginator
     {
         return $this->repository->getPaginatedCars($perPage);
     }
