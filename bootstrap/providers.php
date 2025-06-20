@@ -1,6 +1,9 @@
 <?php
 
+use App\Modules\Car\Providers\CarServicesProvider;
+use App\Modules\Comms\Providers\PaginationServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Modules\Car\Providers\CarServicesProvider::class,
+    PaginationServiceProvider::class,
+    CarServicesProvider::class,
 ];

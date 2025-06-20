@@ -19,7 +19,7 @@ class CarRepository implements CarRepositoryInterface
         return Car::find($id);
     }
 
-    public function getPaginatedCars(null|int $perPage): Paginator
+    public function getPaginatedCars(int $perPage): Paginator
     {
         return Car::simplePaginate($perPage);
     }

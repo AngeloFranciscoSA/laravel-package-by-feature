@@ -5,6 +5,7 @@ namespace App\Modules\Car\Interfaces\Http\Action;
 use App\Modules\Car\Interfaces\Http\Requests\CarRequests;
 use App\Modules\Car\Services\CarService;
 use Exception;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\JsonResponse;
 
 class CarAction
@@ -18,13 +19,18 @@ class CarAction
 
     /**
      * @param CarRequests $request
-     * @return JsonResponse
+     * @return Paginator|JsonResponse
      */
-    public function __invoke(CarRequests $request): JsonResponse
+    public function __invoke(CarRequests $request): Paginator|JsonResponse
     {
         try {
-            $cars = $this->service->listCars(perPage: $request->input('perPage'));
-            return response()->json($cars);
+            $cars = $this->service->listCars(perPage: $request->input('perPage') ?? 15);
+
+            if($request->wantsJson()){
+                return response()->json($cars);
+            }
+
+            return $cars;
         }catch (Exception $exception){
             return response()->json([$exception->getMessage(), $exception->getCode()], 500);
         }
