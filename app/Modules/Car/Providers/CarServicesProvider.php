@@ -22,5 +22,8 @@ class CarServicesProvider extends ServiceProvider
         // Rotas para API
         Route::prefix('api')
             ->group(__DIR__ . '/../Interfaces/Routes/api.php');
+
+        // Carregar as views
+        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'car');
     }
 }
