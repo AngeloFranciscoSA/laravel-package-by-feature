@@ -85,6 +85,8 @@ class MakeTestModule extends Command
 
     private function listActionTestStub($name): string
     {
+        $name_lower = strtolower($name);
+
         return <<<PHP
         <?php
 
@@ -103,12 +105,13 @@ class MakeTestModule extends Command
 
                 \$response->assertStatus(200);
             }
-
-            private function kebab(string \$string): string
-            {
-                return strtolower(preg_replace('/(?<!^)[A-Z]/', '-\$0', \$string));
-            }
         }
         PHP;
     }
+
+    private function kebab(string $string): string
+    {
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $string));
+    }
+
 }
