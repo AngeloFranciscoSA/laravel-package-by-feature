@@ -65,6 +65,10 @@ class CarRepositoryTest extends TestCase
         $this->assertDatabaseHas('cars', $car);
     }
 
+    /**
+     * Test function: Update a car.
+     * @return void
+     */
     public function test_can_update_a_car(): void
     {
         $car = Car::factory()->create([
@@ -86,6 +90,10 @@ class CarRepositoryTest extends TestCase
 
         $updated = $repository->update($car, $updateInfos);
 
+        $this->assertTrue($updated);
+
+        $car->refresh();
+
         $this->assertEquals($updateInfos['brand'], $car->brand);
         $this->assertEquals($updateInfos['model'], $car->model);
         $this->assertEquals($updateInfos['year'], $car->year);
@@ -93,6 +101,10 @@ class CarRepositoryTest extends TestCase
         $this->assertEquals($updateInfos['price'], $car->price);
     }
 
+    /**
+     * Test function: Delete a car.
+     * @return void
+     */
     public function test_can_delete_a_car(): void
     {
         $car = Car::factory()->create();
