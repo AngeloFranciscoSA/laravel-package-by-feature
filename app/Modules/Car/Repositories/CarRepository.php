@@ -4,8 +4,8 @@ namespace App\Modules\Car\Repositories;
 
 use App\Modules\Car\Models\Car;
 use App\Modules\Car\Repositories\Contracts\CarRepositoryInterface;
-use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CarRepository implements CarRepositoryInterface
 {
@@ -19,9 +19,9 @@ class CarRepository implements CarRepositoryInterface
         return Car::find($id);
     }
 
-    public function getPaginatedCars(int $perPage): Paginator
+    public function getPaginatedCars(int $perPage): LengthAwarePaginator
     {
-        return Car::simplePaginate($perPage);
+        return Car::query()->paginate($perPage);
     }
 
     public function create(array $car): Car

@@ -24,7 +24,7 @@ class ListCarAction
     public function __invoke(ListCarRequests $request): Paginator|JsonResponse
     {
         try {
-            $cars = $this->service->listCars(perPage: $request->input('perPage') ?? 15);
+            $cars = $this->service->getAllCarsPaginated(perPage: $request->input('perPage') ?? 15);
 
             if($request->wantsJson()){
                 return response()->json($cars);
