@@ -2,13 +2,13 @@
 
 namespace App\Modules\Car\Interfaces\Http\Action;
 
-use App\Modules\Car\Interfaces\Http\Requests\CarRequests;
+use App\Modules\Car\Interfaces\Http\Requests\ListCarRequests;
 use App\Modules\Car\Services\CarService;
 use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\JsonResponse;
 
-class CarAction
+class ListCarAction
 {
     private CarService $service;
 
@@ -18,10 +18,10 @@ class CarAction
     }
 
     /**
-     * @param CarRequests $request
+     * @param ListCarRequests $request
      * @return Paginator|JsonResponse
      */
-    public function __invoke(CarRequests $request): Paginator|JsonResponse
+    public function __invoke(ListCarRequests $request): Paginator|JsonResponse
     {
         try {
             $cars = $this->service->listCars(perPage: $request->input('perPage') ?? 15);

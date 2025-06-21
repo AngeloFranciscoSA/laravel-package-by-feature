@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CarRequests extends FormRequest
+class ShowCarRequests extends FormRequest
 {
     const HTTP_UNPROCESSABLE_ENTITY = 422;
 
@@ -14,8 +14,6 @@ class CarRequests extends FormRequest
     {
         return [
             'id' => ['numeric'],
-            'records' => ['numeric', 'between:1,10'],
-            'page' => ['numeric', 'min:1'],
         ];
     }
 
