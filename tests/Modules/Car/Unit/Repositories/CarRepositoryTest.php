@@ -55,7 +55,6 @@ class CarRepositoryTest extends TestCase
         ];
 
         $repository = new CarRepository();
-
         $created = $repository->create($car);
 
         $this->assertEquals($car['brand'], $created->brand);
@@ -64,5 +63,43 @@ class CarRepositoryTest extends TestCase
         $this->assertEquals($car['color'], $created->color);
         $this->assertEquals($car['price'], $created->price);
         $this->assertDatabaseHas('cars', $car);
+    }
+
+    public function test_can_update_a_car(): void
+    {
+        $car = Car::factory()->create([
+            'brand' => 'Old Brand',
+            'model' => 'Old Model',
+            'year' => '2017',
+            'color' => 'Red',
+            'price' => 2000,
+        ]);
+        $repository = new CarRepository();
+
+        $updateInfos = [
+            'brand' => 'New Brand',
+            'model' => 'New Model',
+            'year' => '2024',
+            'color' => 'Blue',
+            'price' => 5000,
+        ];
+
+        $updated = $repository->update($car, $updateInfos);
+
+        $this->assertEquals($updateInfos['brand'], $car->brand);
+        $this->assertEquals($updateInfos['model'], $car->model);
+        $this->assertEquals($updateInfos['year'], $car->year);
+        $this->assertEquals($updateInfos['color'], $car->color);
+        $this->assertEquals($updateInfos['price'], $car->price);
+    }
+
+    public function test_can_delete_a_car(): void
+    {
+        $car = Car::factory()->create();
+        $repository = new CarRepository();
+
+        $removed = $repository->destroy($car);
+
+        $this->assertTrue($removed);
     }
 }

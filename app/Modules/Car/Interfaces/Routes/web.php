@@ -10,7 +10,7 @@ Route::get('', function (ListCarRequests $request) {
     return view('car::index', compact('cars'));
 });
 
-Route::get('/{id?}', function (ShowCarRequests $request) {
+Route::get('/{id}', function (ShowCarRequests $request) {
     $car = (new ShowCarAction)($request);
     return view('car::show', compact('car'));
 });
