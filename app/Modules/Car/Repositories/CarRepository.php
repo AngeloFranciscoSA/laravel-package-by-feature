@@ -23,4 +23,19 @@ class CarRepository implements CarRepositoryInterface
     {
         return Car::simplePaginate($perPage);
     }
+
+    public function create(array $car): Car
+    {
+        return Car::create($car);
+    }
+
+    public function update(Car $car)
+    {
+        // TODO: Implement update() method.
+    }
+
+    public function destroy(Car $car)
+    {
+        // TODO: Implement destroy() method.
+    }
 }

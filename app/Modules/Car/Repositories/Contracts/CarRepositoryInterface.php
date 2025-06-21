@@ -13,4 +13,7 @@ interface CarRepositoryInterface
     public function getCarById(int $id): Car;
 
     public function getPaginatedCars(int $perPage): Paginator;
+    public function create(array $car): Car;
+    public function update(Car $car);
+    public function destroy(Car $car);
 }
