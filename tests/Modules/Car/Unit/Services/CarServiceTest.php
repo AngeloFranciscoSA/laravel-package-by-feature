@@ -3,8 +3,6 @@
 namespace Tests\Modules\Car\Unit\Services;
 
 use App\Modules\Car\Models\Car;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
 use App\Modules\Car\Services\CarService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,7 +14,8 @@ class CarServiceTest extends TestCase
     public function test_it_can_list_all_cars_paginated()
     {
         Car::factory()->count(30)->create();
-        $service = new CarService();
+
+        $service = app(CarService::class);
 
         $result = $service->getAllCarsPaginated(15);
 
@@ -38,7 +37,8 @@ class CarServiceTest extends TestCase
             'color' => 'Red',
             'price' => 2000,
         ]);
-        $service = new CarService();
+
+        $service = app(CarService::class);
 
         $result = $service->showCar($car->id);
 
@@ -61,7 +61,7 @@ class CarServiceTest extends TestCase
             'price' => 2000,
         ]);
 
-        $service = new CarService();
+        $service = app(CarService::class);
 
         $updateInfos = [
             'brand' => 'New Brand',
@@ -88,7 +88,7 @@ class CarServiceTest extends TestCase
     {
         $car = Car::factory()->create();
 
-        $service = new CarService();
+        $service = app(CarService::class);
 
         $result = $service->deleteCar($car);
 

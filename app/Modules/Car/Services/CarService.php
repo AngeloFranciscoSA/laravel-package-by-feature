@@ -11,9 +11,9 @@ class CarService
 
     protected CarRepository $repository;
 
-    public function __construct()
+    public function __construct(CarRepository $repository)
     {
-        $this->repository = new CarRepository();
+        $this->repository = $repository;
     }
 
     public function getAllCarsPaginated(int $perPage): LengthAwarePaginator
