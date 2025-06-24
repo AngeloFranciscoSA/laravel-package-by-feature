@@ -31,7 +31,7 @@ class CarService
         return $this->repository->update($id, $data);
     }
 
-    public function deleteCar(Car $car): bool
+    public function deleteCar(Car $car): ?bool
     {
         return $this->repository->destroy($car);
     }

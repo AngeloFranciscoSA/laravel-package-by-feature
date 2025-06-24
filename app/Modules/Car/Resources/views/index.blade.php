@@ -28,7 +28,9 @@
                     <td>{{ $car->price }}</td>
                     <td>
                         <a class="btn btn-warning" href="{{url("/$car->id")}}">Edit</a>
-                        <a class="btn btn-danger" href="{{url("/$car->id")}}">Remove</a>
+                        <button class="btn btn-danger" onclick="confirmDelete({{ $car->id }})">
+                            Remove
+                        </button>
                     </td>
                 </tr>
             @endforeach
@@ -38,4 +40,51 @@
     <div class="d-flex justify-content-center">
         {{$cars->links()}}
     </div>
+
+    <form id="delete-form-{{ $car->id }}" action="{{ route('cars.destroy', $car->id) }}" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    /** @type {HTMLFormElement} */
+                    const form = document.getElementById(`delete-form-${id}`);
+                    form.submit();
+                }
+            });
+        }
+    </script>
+
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
+    @else
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
 @endsection

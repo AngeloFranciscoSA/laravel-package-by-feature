@@ -34,7 +34,7 @@ class CarRepository implements CarRepositoryInterface
         return $car->update($data);
     }
 
-    public function destroy(Car $car): bool
+    public function destroy(Car $car): ?bool
     {
         return $car->delete();
     }
