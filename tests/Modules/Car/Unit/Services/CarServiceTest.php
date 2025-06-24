@@ -50,4 +50,53 @@ class CarServiceTest extends TestCase
         $this->assertEquals($car->price, $result->price);
 
     }
+
+    public function test_it_can_edit_a_car()
+    {
+        $car = Car::factory()->create([
+            'brand' => 'Old Brand',
+            'model' => 'Old Mark',
+            'year' => '2017',
+            'color' => 'Red',
+            'price' => 2000,
+        ]);
+
+        $service = new CarService();
+
+        $updateInfos = [
+            'brand' => 'New Brand',
+            'model' => 'New Mark',
+            'year' => '2020',
+            'color' => 'Blue',
+            'price' => 5000,
+        ];
+
+        $result = $service->editCar($car, $updateInfos);
+
+        $car->refresh();
+
+        $this->assertTrue($result);
+
+        $this->assertEquals($updateInfos['brand'], $car->brand);
+        $this->assertEquals($updateInfos['model'], $car->model);
+        $this->assertEquals($updateInfos['year'], $car->year);
+        $this->assertEquals($updateInfos['color'], $car->color);
+        $this->assertEquals($updateInfos['price'], $car->price);
+    }
+
+    public function test_it_can_delete_a_car()
+    {
+        $car = Car::factory()->create();
+
+        $service = new CarService();
+
+        $result = $service->deleteCar($car);
+
+        $this->assertTrue($result);
+        $car->refresh();
+
+        $this->assertDatabaseMissing('cars', [
+            'id' => $car->id,
+        ]);
+    }
 }

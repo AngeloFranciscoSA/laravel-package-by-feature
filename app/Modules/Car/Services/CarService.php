@@ -25,4 +25,14 @@ class CarService
     {
         return $this->repository->getCarById($id);
     }
+
+    public function editCar(Car $id, array $data): bool
+    {
+        return $this->repository->update($id, $data);
+    }
+
+    public function deleteCar(Car $car): bool
+    {
+        return $this->repository->destroy($car);
+    }
 }
