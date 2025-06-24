@@ -26,7 +26,10 @@
                     <td>{{ $car->year }}</td>
                     <td>{{ ucfirst($car->color) }}</td>
                     <td>{{ $car->price }}</td>
-                    <td><button class="btn btn-primary">Edit</button></td>
+                    <td>
+                        <a class="btn btn-warning" href="{{url("/$car->id")}}">Edit</a>
+                        <a class="btn btn-danger" href="{{url("/$car->id")}}">Remove</a>
+                    </td>
                 </tr>
             @endforeach
         </tbody>
