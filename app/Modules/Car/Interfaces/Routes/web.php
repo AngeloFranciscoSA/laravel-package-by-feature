@@ -6,7 +6,4 @@ use App\Modules\Car\Interfaces\Http\Requests\ShowCarRequests;
 
 Route::get('', ListCarAction::class)->name('car.index');
 
-Route::get('/{id}', function (ShowCarRequests $request) {
-    $car = (new ShowCarAction)($request);
-    return view('car::show', compact('car'));
-});
+Route::get('/{id}', ShowCarAction::class)->name('car.show');

@@ -5,6 +5,7 @@ namespace Tests\Modules\Car\Feature\Actions;
 use App\Modules\Car\Interfaces\Http\Action\ListCarAction;
 use App\Modules\Car\Interfaces\Http\Requests\ListCarRequests;
 use App\Modules\Car\Services\CarService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
@@ -71,7 +72,7 @@ class ListCarActionTest extends TestCase
     {
         $serviceMock = Mockery::mock(CarService::class);
         $serviceMock->shouldReceive('getAllCarsPaginated')
-            ->andThrow(new \Exception('Erro', 123));
+            ->andThrow(new Exception('Erro', 123));
 
         $requestMock = Mockery::mock(ListCarRequests::class);
         $requestMock->shouldReceive('input')->andReturn(null);
