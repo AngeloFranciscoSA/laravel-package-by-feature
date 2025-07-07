@@ -18,8 +18,8 @@ class EditCarRequests extends FormRequest
             'model' => ['required','string'],
             'year' => ['required','numeric'],
             'color' => ['required','string'],
-            'price' => ['required','numeric'],
-            'photo' => ['image'],
+            'price' => ['required','string'],
+            'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:1024'],
         ];
     }
 

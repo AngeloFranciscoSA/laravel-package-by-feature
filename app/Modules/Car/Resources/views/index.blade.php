@@ -66,25 +66,17 @@
         }
     </script>
 
-    @if (session('success'))
+    @if (request('msg'))
         <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false
-            });
-        </script>
-    @else
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false
-            });
+            document.addEventListener('DOMContentLoaded', () => {
+                Swal.fire({
+                    icon: '{{ request('type', 'info') }}', // pode ser 'success', 'error', 'warning', etc.
+                    title: '{{ ucfirst(request('type', 'Info')) }}!',
+                    text: @json(ucfirst(request('msg'))),
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            })
         </script>
     @endif
 @endsection

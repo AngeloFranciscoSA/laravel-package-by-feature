@@ -4,6 +4,7 @@ use App\Modules\Car\Interfaces\Http\Action\DestroyCarAction;
 use App\Modules\Car\Interfaces\Http\Action\ListCarAction;
 use App\Modules\Car\Interfaces\Http\Action\ShowCarAction;
 use App\Modules\Car\Interfaces\Http\Action\UpdateCarAction;
+use Illuminate\Support\Facades\Route;
 
 Route::get('', ListCarAction::class)->name('cars.index');
 
