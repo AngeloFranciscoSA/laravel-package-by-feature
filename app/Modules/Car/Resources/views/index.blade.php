@@ -65,14 +65,13 @@
             });
         }
     </script>
-
-    @if (request('msg'))
+    @if (session('msg'))
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 Swal.fire({
-                    icon: '{{ request('type', 'info') }}', // pode ser 'success', 'error', 'warning', etc.
-                    title: '{{ ucfirst(request('type', 'Info')) }}!',
-                    text: @json(ucfirst(request('msg'))),
+                    icon: '{{ session('type', 'info') }}', // pode ser 'success', 'error', 'warning', etc.
+                    title: '{{ ucfirst(session('type', 'Info')) }}!',
+                    text: @json(ucfirst(session('msg'))),
                     timer: 3000,
                     showConfirmButton: false
                 });

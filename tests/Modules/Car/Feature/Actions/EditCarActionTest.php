@@ -44,13 +44,20 @@ class EditCarActionTest extends TestCase
             ->andReturn(true);
 
         $requestMock = Mockery::mock(EditCarRequests::class);
-        $requestMock->shouldReceive('all')
+        $requestMock->shouldReceive('validated')
         ->once()
         ->andReturn($updateInfos);
 
         $action = new UpdateCarAction($serviceMock);
         $result = $action->__invoke($car, $requestMock);
 
-        $this->assertTrue($result);
+        $session = $result->getSession();
+
+        $msg = $session->get('msg');
+        $type = $session->get('type');
+
+        $this->assertEquals(302, $result->getStatusCode());
+        $this->assertEquals('Car updated successfully!', $msg);
+        $this->assertEquals('success', $type);
     }
 }

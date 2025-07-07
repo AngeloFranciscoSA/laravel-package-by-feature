@@ -24,9 +24,17 @@ class DestroyCarAction
             $car = $this->service->deleteCar($car);
 
             if($car){
-                return redirect()->route('cars.index', ['msg' => 'car  deleted successfully!', 'type' => 'success']);
+                return redirect()->route('cars.index')
+                    ->with([
+                        'msg' => 'Car deleted!',
+                        'type' => 'success',
+                    ]);
             }
-            return redirect()->route('cars.index', ['msg' => 'car not deleted!', 'type' => 'success']);
+            return redirect()->route('cars.index')
+                ->with([
+                    'msg' => 'Car not deleted!',
+                    'type' => 'error',
+                ]);
         }catch (Exception $exception){
             return response()->json([$exception->getMessage(), $exception->getCode()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

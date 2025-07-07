@@ -23,15 +23,20 @@ class UpdateCarAction
     {
         try {
             $data = $request->validated();
-
-            unset($data['photo']);
             $car = $this->service->editCar($car, $data);
 
             if($car){
-
-                return redirect()->route('cars.index', ['msg' => 'car updated successfully!', 'type' => 'success']);
+                return redirect()->route('cars.index')
+                    ->with([
+                        'msg' => 'Car updated successfully!',
+                        'type' => 'success',
+                    ]);
             }
-            return redirect()->route('cars.index', ['msg' => 'car not updated!', 'type' => 'error']);
+            return redirect()->route('cars.index')
+                ->with([
+                    'msg' => 'Car not updated!',
+                    'type' => 'error',
+                ]);
 
         }catch (Exception $exception){
             return response()->json([$exception->getMessage(), $exception->getCode()], Response::HTTP_INTERNAL_SERVER_ERROR);
