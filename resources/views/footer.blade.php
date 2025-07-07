@@ -1,3 +1,4 @@
 <footer>
-    <p>&copy; {{ date('Y') }} Minha Empresa</p>
+    <hr>
+    <p class="text-center">&copy; {{ date('Y') }} My company</p>
 </footer>

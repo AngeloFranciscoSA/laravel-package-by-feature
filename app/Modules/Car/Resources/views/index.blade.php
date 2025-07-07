@@ -25,7 +25,7 @@
                     <td>{{ ucfirst($car->model) }}</td>
                     <td>{{ $car->year }}</td>
                     <td>{{ ucfirst($car->color) }}</td>
-                    <td>{{ $car->price }}</td>
+                    <td>{{ number_format($car->price, 2)}}</td>
                     <td>
                         <a class="btn btn-warning" href="{{url("/$car->id")}}">Edit</a>
                         <button class="btn btn-danger" onclick="confirmDelete({{ $car->id }})">

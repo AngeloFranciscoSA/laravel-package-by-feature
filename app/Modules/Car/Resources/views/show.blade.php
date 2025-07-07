@@ -11,7 +11,7 @@
     </div>
     <div class="mb-3">
         <label for="model" class="form-label">Model</label>
-        <input type="text" class="form-control" id="model" value="{{ $car->model }}">
+        <input type="text" class="form-control" id="model" value="{{ ucfirst($car->model) }}">
     </div>
     <div class="mb-3">
         <label for="year" class="form-label">Year</label>
@@ -19,11 +19,11 @@
     </div>
     <div class="mb-3">
         <label for="color" class="form-label">Color</label>
-        <input type="text" class="form-control" id="color" value="{{ $car->color }}">
+        <input type="text" class="form-control" id="color" value="{{ ucfirst($car->color) }}">
     </div>
     <div class="mb-3">
         <label for="price" class="form-label">Price</label>
-        <input type="text" class="form-control" id="price" value="{{ $car->price }}">
+        <input type="text" class="form-control" id="price" value="{{ number_format($car->price, 2) }}">
     </div>
 
     <div class="mb-3">
@@ -32,6 +32,13 @@
     </div>
 
     <div class="d-flex justify-content-center">
-        <a class="btn btn-secondary" href="{{url('/')}}">Back</a>
+        <div class="row">
+            <div class="col">
+                <a class="btn btn-success" href="{{url('/')}}">Confirm</a>
+            </div>
+            <div class="col">
+                <a class="btn btn-secondary" href="{{url('/')}}">Back</a>
+            </div>
+        </div>
     </div>
 @endsection
