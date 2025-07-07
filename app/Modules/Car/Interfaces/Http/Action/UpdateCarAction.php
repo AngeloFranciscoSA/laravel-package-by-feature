@@ -2,6 +2,7 @@
 
 namespace App\Modules\Car\Interfaces\Http\Action;
 
+use App\Modules\Car\Interfaces\Http\Requests\EditCarRequests;
 use App\Modules\Car\Models\Car;
 use App\Modules\Car\Services\CarService;
 
@@ -14,8 +15,9 @@ class UpdateCarAction
         $this->service = $service;
     }
 
-    public function __invoke(Car $car): bool
+    public function __invoke(Car $car, EditCarRequests $request): bool
     {
-        return $this->service->deleteCar($car);
+        $data = $request->all();
+        return $this->service->editCar($car, $data);
     }
 }
