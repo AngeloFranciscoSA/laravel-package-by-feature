@@ -2,6 +2,7 @@
 
 namespace App\Modules\Car\Interfaces\Http\Action;
 
+use App\Modules\Car\Interfaces\Http\Requests\DestroyCarRequests;
 use App\Modules\Car\Models\Car;
 use App\Modules\Car\Services\CarService;
 use Exception;
@@ -18,11 +19,10 @@ class DestroyCarAction
         $this->service = $service;
     }
 
-    public function __invoke(Car $car): RedirectResponse|JsonResponse
+    public function __invoke(DestroyCarRequests $request): RedirectResponse|JsonResponse
     {
         try {
-            $car = $this->service->deleteCar($car);
-
+            $car = $this->service->deleteCar(id: $request->get('id'));
             if($car){
                 return redirect()->route('cars.index')
                     ->with([

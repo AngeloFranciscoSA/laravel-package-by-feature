@@ -2,6 +2,8 @@
 
 namespace App\Modules\Car\Providers;
 
+
+use App\Modules\Car\Models\Car;
 use App\Modules\Car\Repositories\CarRepository;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;

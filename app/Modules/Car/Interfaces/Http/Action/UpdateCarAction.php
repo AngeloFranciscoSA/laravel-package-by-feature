@@ -19,11 +19,11 @@ class UpdateCarAction
         $this->service = $service;
     }
 
-    public function __invoke(Car $car, EditCarRequests $request): RedirectResponse|JsonResponse
+    public function __invoke(EditCarRequests $request): RedirectResponse|JsonResponse
     {
         try {
             $data = $request->validated();
-            $car = $this->service->editCar($car, $data);
+            $car = $this->service->editCar(id: $data['id'], data: $data);
 
             if($car){
                 return redirect()->route('cars.index')

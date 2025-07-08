@@ -14,6 +14,6 @@ interface CarRepositoryInterface
 
     public function getPaginatedCars(int $perPage): LengthAwarePaginator;
     public function create(array $car): Car;
-    public function update(Car $car, array $data): bool;
-    public function destroy(Car $car): ?bool;
+    public function update(int $id, array $data): bool;
+    public function destroy(int $id): ?bool;
 }

@@ -26,13 +26,16 @@ class CarService
         return $this->repository->getCarById($id);
     }
 
-    public function editCar(Car $id, array $data): bool
+    public function editCar(int $id, array $data): bool
     {
+        unset($data['id']);
+
+        $data['price'] = str_replace(",", "", $data['price']);
         return $this->repository->update($id, $data);
     }
 
-    public function deleteCar(Car $car): ?bool
+    public function deleteCar(int $id): ?bool
     {
-        return $this->repository->destroy($car);
+        return $this->repository->destroy(id: $id);
     }
 }

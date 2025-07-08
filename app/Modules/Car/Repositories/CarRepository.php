@@ -29,13 +29,21 @@ class CarRepository implements CarRepositoryInterface
         return Car::create($car);
     }
 
-    public function update(Car $car, array $data): bool
+    public function update(int $id, array $data): bool
     {
-        return $car->update($data);
+        $car = Car::find($id);
+        if($car){
+            return $car->update($data);
+        }
+        return false;
     }
 
-    public function destroy(Car $car): ?bool
+    public function destroy(int $id): bool
     {
-        return $car->delete();
+        $car = Car::find($id);
+        if($car){
+            return $car->delete();
+        }
+        return false;
     }
 }

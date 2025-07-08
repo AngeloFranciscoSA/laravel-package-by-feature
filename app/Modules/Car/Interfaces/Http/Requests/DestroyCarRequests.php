@@ -13,7 +13,7 @@ class DestroyCarRequests extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => ['numeric', 'min:1'],
+            'id' => ['required','numeric', 'min:1'],
         ];
     }
 

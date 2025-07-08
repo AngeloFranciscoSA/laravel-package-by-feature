@@ -31,6 +31,10 @@
                         <button class="btn btn-danger" onclick="confirmDelete({{ $car->id }})">
                             Remove
                         </button>
+                        <form id="delete-form-{{ $car->id }}" action="{{ route('cars.destroy', $car->id) }}" method="POST" style="display: none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
                     </td>
                 </tr>
             @endforeach
@@ -40,11 +44,6 @@
     <div class="d-flex justify-content-center">
         {{$cars->links()}}
     </div>
-
-    <form id="delete-form-{{ $car->id }}" action="{{ route('cars.destroy', $car->id) }}" method="POST" style="display: none;">
-        @csrf
-        @method('DELETE')
-    </form>
 
     <script>
         function confirmDelete(id) {
