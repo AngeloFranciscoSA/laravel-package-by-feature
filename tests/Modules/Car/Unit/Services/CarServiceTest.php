@@ -64,6 +64,7 @@ class CarServiceTest extends TestCase
         $service = app(CarService::class);
 
         $updateInfos = [
+            'id'=> $car->id,
             'brand' => 'New Brand',
             'model' => 'New Mark',
             'year' => '2020',
@@ -71,7 +72,7 @@ class CarServiceTest extends TestCase
             'price' => 5000,
         ];
 
-        $result = $service->editCar($car, $updateInfos);
+        $result = $service->editCar($updateInfos);
 
         $car->refresh();
 
@@ -90,10 +91,9 @@ class CarServiceTest extends TestCase
 
         $service = app(CarService::class);
 
-        $result = $service->deleteCar($car);
+        $result = $service->deleteCar($car->id);
 
         $this->assertTrue($result);
-        $car->refresh();
 
         $this->assertDatabaseMissing('cars', [
             'id' => $car->id,

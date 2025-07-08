@@ -88,7 +88,7 @@ class CarRepositoryTest extends TestCase
             'price' => 5000,
         ];
 
-        $updated = $repository->update($car, $updateInfos);
+        $updated = $repository->update($car->id, $updateInfos);
 
         $this->assertTrue($updated);
 
@@ -110,7 +110,7 @@ class CarRepositoryTest extends TestCase
         $car = Car::factory()->create();
         $repository = new CarRepository();
 
-        $removed = $repository->destroy($car);
+        $removed = $repository->destroy($car->id);
 
         $this->assertTrue($removed);
     }
