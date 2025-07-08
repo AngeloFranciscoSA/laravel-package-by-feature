@@ -31,6 +31,7 @@ class EditCarActionTest extends TestCase
         ]);
 
         $updateInfos = [
+            'id' => $car->id,
             'brand' => 'New Brand',
             'model' => 'New Mark',
             'year' => '2020',
@@ -40,7 +41,7 @@ class EditCarActionTest extends TestCase
 
         $serviceMock = Mockery::mock(CarService::class);
         $serviceMock->shouldReceive('editCar')
-            ->with($car, $updateInfos)
+            ->with($updateInfos)
             ->andReturn(true);
 
         $requestMock = Mockery::mock(EditCarRequests::class);
@@ -49,7 +50,7 @@ class EditCarActionTest extends TestCase
         ->andReturn($updateInfos);
 
         $action = new UpdateCarAction($serviceMock);
-        $result = $action->__invoke($car, $requestMock);
+        $result = $action->__invoke($requestMock);
 
         $session = $result->getSession();
 

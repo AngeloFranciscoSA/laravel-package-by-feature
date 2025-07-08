@@ -26,11 +26,15 @@ class CarService
         return $this->repository->getCarById($id);
     }
 
-    public function editCar(int $id, array $data): bool
+    public function editCar(array $data): bool
     {
+        //Capturando ID
+        $id = $data["id"];
         unset($data['id']);
 
+        // Tratando valores com strings erradas.
         $data['price'] = str_replace(",", "", $data['price']);
+
         return $this->repository->update($id, $data);
     }
 

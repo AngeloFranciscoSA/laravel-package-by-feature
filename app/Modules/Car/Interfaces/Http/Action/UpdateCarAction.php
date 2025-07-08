@@ -23,7 +23,7 @@ class UpdateCarAction
     {
         try {
             $data = $request->validated();
-            $car = $this->service->editCar(id: $data['id'], data: $data);
+            $car = $this->service->editCar(data: $data);
 
             if($car){
                 return redirect()->route('cars.index')
