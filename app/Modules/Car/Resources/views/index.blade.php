@@ -3,78 +3,52 @@
 @section('title', 'Lista de Carros')
 
 @section('content')
-    <h1 class="text-center">Cars Available</h1>
+    <h1 class="text-center mt-3 mb-3">Cars Available</h1>
 
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Brand</th>
-                <th scope="col">Model</th>
-                <th scope="col">Year</th>
-                <th scope="col">Color</th>
-                <th scope="col">Price</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($cars as $car)
-                <tr>
-                    <th>{{ $car->id }}</th>
-                    <td>{{ $car->brand }}</td>
-                    <td>{{ ucfirst($car->model) }}</td>
-                    <td>{{ $car->year }}</td>
-                    <td>{{ ucfirst($car->color) }}</td>
-                    <td>{{ number_format($car->price, 2)}}</td>
-                    <td>
-                        <a class="btn btn-warning" href="{{url("/$car->id")}}">Edit</a>
-                        <button class="btn btn-danger" onclick="confirmDelete({{ $car->id }})">
-                            Remove
-                        </button>
-                        <form id="delete-form-{{ $car->id }}" action="{{ route('cars.destroy', $car->id) }}" method="POST" style="display: none;">
-                            @csrf
-                            @method('DELETE')
-                        </form>
-                    </td>
-                </tr>
+
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            @foreach ($cars as $car)
+                <div class="swiper-slide">
+                    <div class="p-4 border rounded text-center bg-white shadow">
+                        <img src="https://www.w3schools.com/w3css/img_car.jpg" alt="Car" class="img-fluid rounded-4 shadow-sm">
+                        <h3 class="mt-3 text-lg font-bold">{{ $car->brand }}</h3>
+                        <div>
+                            <p>
+                                <span class="fw-bold">Model:</span>
+                                {{ $car->model }}
+                            </p>
+                            <p>
+                                <span class="fw-bold">Year:</span>
+                                {{ $car->year }}
+                            </p>
+                            <p>
+                                <span class="fw-bold">Color:</span>
+                                {{ $car->color }}
+                            </p>
+                            <p>
+                                <span class="fw-bold">Price:</span>
+                                {{ number_format($car->price, 2) }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             @endforeach
-        </tbody>
-    </table>
-
-    <div class="d-flex justify-content-center">
-        {{$cars->links()}}
+        </div>
     </div>
-
     <script>
-        function confirmDelete(id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    /** @type {HTMLFormElement} */
-                    const form = document.getElementById(`delete-form-${id}`);
-                    form.submit();
-                }
+        document.addEventListener("DOMContentLoaded", function () {
+            new Swiper(".mySwiper", {
+                loop: true,
+                slidesPerView: 3,
+                spaceBetween: 20,
+                autoplay: false,
+                breakpoints: {
+                    640: {slidesPerView: 1},
+                    768: {slidesPerView: 2},
+                    1024: {slidesPerView: 3},
+                },
             });
-        }
+        });
     </script>
-    @if (session('msg'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                Swal.fire({
-                    icon: '{{ session('type', 'info') }}', // pode ser 'success', 'error', 'warning', etc.
-                    title: '{{ ucfirst(session('type', 'Info')) }}!',
-                    text: @json(ucfirst(session('msg'))),
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            })
-        </script>
-    @endif
 @endsection
