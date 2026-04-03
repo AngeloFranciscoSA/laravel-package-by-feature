@@ -80,7 +80,7 @@ HTTP Request
 ```bash
 # 1. Clone and install dependencies
 git clone <repo>
-cd projeto-estudo
+cd laravel-package-by-feature
 composer install
 npm install
 
