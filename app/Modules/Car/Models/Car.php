@@ -43,6 +43,7 @@ class Car extends Model {
         'year',
         'color',
         'price',
+        'image_url',
     ];
 
     protected static function newFactory(): CarFactory

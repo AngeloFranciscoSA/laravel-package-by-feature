@@ -1,6 +1,6 @@
 # Study Project — Laravel Modular (Package by Feature)
 
-A study project focused on the **Package by Feature** architecture (modular monolith) using Laravel 12. The main domain is a car catalog with CRUD, pagination, and HTML or JSON responses via content negotiation.
+A study project focused on the **Package by Feature** architecture (modular monolith) using Laravel 12. The main domain is a car catalog with CRUD, pagination, and SPA frontend via Inertia.js + Vue 3.
 
 > **Status:** Actively in development.
 
@@ -11,17 +11,17 @@ A study project focused on the **Package by Feature** architecture (modular mono
 | Layer | Technology |
 |---|---|
 | Backend | PHP 8.2+, Laravel 12 |
-| Frontend | Vue 3, Tailwind CSS 4 |
+| Frontend | Vue 3, Inertia.js, Tailwind CSS 4 |
 | Build | Vite 6 |
 | Database | SQLite (default) |
 | Testing | PHPUnit 11, Mockery, ParaTest |
-| JS | Vue Router, Pinia, VueUse, Axios, SweetAlert2 |
+| JS | Inertia.js, Pinia, VueUse, Axios, SweetAlert2 |
 
 ---
 
 ## Architecture — Package by Feature
 
-Each feature lives in its own module under `app/Modules/`, containing everything it needs to work independently.
+Each feature lives in its own module under `app/Modules/`, containing everything it needs to work independently — including its own Vue pages.
 
 ```
 app/
@@ -33,7 +33,7 @@ app/
 │   │   │   │   └── Requests/        # Form Requests with validation
 │   │   │   └── Routes/
 │   │   │       ├── api.php          # JSON routes (/api/cars)
-│   │   │       └── web.php          # HTML routes (/cars)
+│   │   │       └── web.php          # Inertia routes (/cars)
 │   │   ├── Models/
 │   │   │   └── Car.php
 │   │   ├── Providers/
@@ -43,22 +43,35 @@ app/
 │   │   │   │   └── CarRepositoryInterface.php
 │   │   │   └── CarRepository.php
 │   │   ├── Resources/
-│   │   │   └── views/               # Module views (index, show)
+│   │   │   └── Pages/               # Vue pages owned by this module
+│   │   │       ├── Index.vue
+│   │   │       └── Show.vue
 │   │   └── Services/
 │   │       └── CarService.php
 │   └── Comms/
 │       └── Providers/
-│           └── PaginationServiceProvider.php  # Pagination styling
+│           └── PaginationServiceProvider.php
 └── Console/Commands/
     ├── MakeModulesCommand.php        # Artisan: scaffold a new module
     └── MakeTestModule.php            # Artisan: scaffold tests for a module
+```
+
+### Why Inertia.js fits Package by Feature
+
+With Inertia, each module owns its Vue pages inside `Resources/Pages/`. The module is truly self-contained: routes, controller, service, repository, model, and UI all live together.
+
+A custom resolver in `app.js` maps page names to module paths:
+
+```
+Inertia::render('Car/Index')
+    └── app/Modules/Car/Resources/Pages/Index.vue
 ```
 
 ### Request flow
 
 ```
 HTTP Request
-    └── Action (invokable controller)
+    └── Action (Inertia::render or JSON response)
             └── Service (business logic)
                     └── Repository (data access)
                             └── Eloquent Model
@@ -68,12 +81,12 @@ HTTP Request
 
 ## Features
 
-- Car listing with pagination
+- Car listing with pagination (Inertia SPA)
 - View and edit a single car
 - Delete with confirmation dialog (SweetAlert2)
-- REST API with content negotiation (HTML or JSON from the same route)
-- SPA frontend with Vue 3 + Vue Router
-- Global state management with Pinia
+- REST API still available via `Accept: application/json`
+- Flash messages shared globally via `HandleInertiaRequests`
+- Car images cached locally from loremflickr during seeding
 
 ---
 
@@ -90,12 +103,17 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
-# 3. Create the database and run migrations
-php artisan migrate
+# 3. Create storage symlink (required for car images)
+php artisan storage:link
 
-# 4. Start all servers in parallel
+# 4. Run migrations and seed
+php artisan migrate --seed
+
+# 5. Start all servers in parallel
 composer run dev
 ```
+
+> On first seed, ~20 car images are downloaded from loremflickr and cached in `storage/app/public/cars/`. Subsequent seeds reuse the cache.
 
 The `composer run dev` command starts concurrently: Laravel server, Vite, queue worker, and log viewer (Pail).
 
@@ -103,12 +121,13 @@ The `composer run dev` command starts concurrently: Laravel server, Vite, queue 
 
 ```
 resources/js/
-├── App.vue          # Root component
-├── app.js           # Entry point (Vue + Pinia + Router)
-├── components/      # Reusable components
-├── pages/           # Route-level page components
-├── router/          # Vue Router configuration
+├── app.js           # Entry point — initializes Inertia + Vue + Pinia
+├── bootstrap.js     # Axios setup
+├── components/      # Reusable Vue components
 └── stores/          # Pinia stores
+
+app/Modules/{Module}/Resources/Pages/
+└── *.vue            # Pages belong to their module, not a central folder
 ```
 
 ---
@@ -154,14 +173,14 @@ php artisan make:test-module ModuleName
 
 ## Available Routes
 
-| Method | URI | Action |
+| Method | URI | Response |
 |---|---|---|
-| GET | `/cars` | List all cars (view or JSON) |
-| GET | `/cars/{id}` | Show a car |
-| PUT | `/cars/{id}` | Update a car |
-| DELETE | `/cars/{id}` | Delete a car |
-| GET | `/api/cars` | List (JSON) |
-| GET | `/api/cars/{id}` | Detail (JSON) |
+| GET | `/cars` | Inertia page (SPA) |
+| GET | `/cars/{id}` | Inertia page (SPA) |
+| PUT | `/cars/{id}` | Redirect |
+| DELETE | `/cars/{id}` | Redirect |
+| GET | `/api/cars` | JSON |
+| GET | `/api/cars/{id}` | JSON |
 
 ---
 
@@ -190,5 +209,6 @@ tests/
 - Structure a Laravel project with **Package by Feature** instead of flat MVC
 - Apply the **Repository Pattern** with contracts (interfaces)
 - Separate concerns with **Service Layer** and **Action Classes**
+- Integrate **Inertia.js** to keep Vue pages co-located with their module
 - Write unit and feature tests with mocks (Mockery)
-- Use **content negotiation** to serve HTML and JSON from the same action
+- Use content negotiation to serve Inertia or JSON from the same action
