@@ -11,11 +11,11 @@ A study project focused on the **Package by Feature** architecture (modular mono
 | Layer | Technology |
 |---|---|
 | Backend | PHP 8.2+, Laravel 12 |
-| Frontend | Blade, Tailwind CSS 4, Bootstrap 5 |
+| Frontend | Vue 3, Tailwind CSS 4 |
 | Build | Vite 6 |
 | Database | SQLite (default) |
 | Testing | PHPUnit 11, Mockery, ParaTest |
-| JS | Axios, Swiper, SweetAlert2 |
+| JS | Vue Router, Pinia, VueUse, Axios, SweetAlert2 |
 
 ---
 
@@ -48,7 +48,7 @@ app/
 │   │       └── CarService.php
 │   └── Comms/
 │       └── Providers/
-│           └── PaginationServiceProvider.php  # Bootstrap pagination styling
+│           └── PaginationServiceProvider.php  # Pagination styling
 └── Console/Commands/
     ├── MakeModulesCommand.php        # Artisan: scaffold a new module
     └── MakeTestModule.php            # Artisan: scaffold tests for a module
@@ -68,10 +68,12 @@ HTTP Request
 
 ## Features
 
-- Car listing with pagination (Swiper carousel)
+- Car listing with pagination
 - View and edit a single car
 - Delete with confirmation dialog (SweetAlert2)
 - REST API with content negotiation (HTML or JSON from the same route)
+- SPA frontend with Vue 3 + Vue Router
+- Global state management with Pinia
 
 ---
 
@@ -96,6 +98,18 @@ composer run dev
 ```
 
 The `composer run dev` command starts concurrently: Laravel server, Vite, queue worker, and log viewer (Pail).
+
+### Frontend structure
+
+```
+resources/js/
+├── App.vue          # Root component
+├── app.js           # Entry point (Vue + Pinia + Router)
+├── components/      # Reusable components
+├── pages/           # Route-level page components
+├── router/          # Vue Router configuration
+└── stores/          # Pinia stores
+```
 
 ---
 
