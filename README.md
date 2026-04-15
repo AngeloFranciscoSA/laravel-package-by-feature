@@ -4,6 +4,8 @@ A study project focused on the **Package by Feature** architecture (modular mono
 
 > **Status:** Actively in development.
 
+> **Note:** This project uses [Claude](https://claude.ai) (Anthropic) as an assistant for hands-on practice and for writing business rule documentation as new features are added over time.
+
 ---
 
 ## Tech Stack
@@ -16,6 +18,19 @@ A study project focused on the **Package by Feature** architecture (modular mono
 | Database | SQLite (default) |
 | Testing | PHPUnit 11, Mockery, ParaTest |
 | JS | Inertia.js, Pinia, VueUse, Axios, SweetAlert2 |
+
+---
+
+## Documentation
+
+Detailed docs are available in the [`/docs`](./docs) folder:
+
+| File | Description |
+|---|---|
+| [`docs/architecture.md`](./docs/architecture.md) | Layer responsibilities, request flow, why Inertia over REST API |
+| [`docs/modules.md`](./docs/modules.md) | How to create and register a new module |
+| [`docs/frontend.md`](./docs/frontend.md) | Inertia page resolver, Vue pages, flash, pagination, Pinia |
+| [`docs/seeding.md`](./docs/seeding.md) | Factory, seeder, and image caching flow |
 
 ---
 
