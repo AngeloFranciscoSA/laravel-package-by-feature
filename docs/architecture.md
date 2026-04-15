@@ -136,9 +136,9 @@ With a REST API + axios approach, Vue pages would live in `resources/js/pages/Ca
 
 With Inertia, the Action still controls what data the page receives. Vue pages live inside the module at `Resources/Pages/`. The module remains the single source of truth for its domain.
 
-| | Inertia | REST API + axios |
-|---|---|---|
-| Pages co-located with module | Yes | No |
-| Module is self-contained | Yes | No |
-| Boilerplate | Low | High (stores, fetch, error handling) |
-| Best when | UI is part of the module | Separate frontend app / mobile |
+|                              | Inertia                  | REST API + axios                     |
+|------------------------------|--------------------------|--------------------------------------|
+| Pages co-located with module | Yes                      | No                                   |
+| Module is self-contained     | Yes                      | No                                   |
+| Boilerplate                  | Low                      | High (stores, fetch, error handling) |
+| Best when                    | UI is part of the module | Separate frontend app / mobile       |

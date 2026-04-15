@@ -10,14 +10,14 @@ A study project focused on the **Package by Feature** architecture (modular mono
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Backend | PHP 8.2+, Laravel 12 |
-| Frontend | Vue 3, Inertia.js, Tailwind CSS 4 |
-| Build | Vite 6 |
-| Database | SQLite (default) |
-| Testing | PHPUnit 11, Mockery, ParaTest |
-| JS | Inertia.js, Pinia, VueUse, Axios, SweetAlert2 |
+| Layer    | Technology                                    |
+|----------|-----------------------------------------------|
+| Backend  | PHP 8.2+, Laravel 12                          |
+| Frontend | Vue 3, Inertia.js, Tailwind CSS 4             |
+| Build    | Vite 6                                        |
+| Database | SQLite (default)                              |
+| Testing  | PHPUnit 11, Mockery, ParaTest                 |
+| JS       | Inertia.js, Pinia, VueUse, Axios, SweetAlert2 |
 
 ---
 
@@ -25,12 +25,12 @@ A study project focused on the **Package by Feature** architecture (modular mono
 
 Detailed docs are available in the [`/docs`](./docs) folder:
 
-| File | Description |
-|---|---|
+| File                                             | Description                                                     |
+|--------------------------------------------------|-----------------------------------------------------------------|
 | [`docs/architecture.md`](./docs/architecture.md) | Layer responsibilities, request flow, why Inertia over REST API |
-| [`docs/modules.md`](./docs/modules.md) | How to create and register a new module |
-| [`docs/frontend.md`](./docs/frontend.md) | Inertia page resolver, Vue pages, flash, pagination, Pinia |
-| [`docs/seeding.md`](./docs/seeding.md) | Factory, seeder, and image caching flow |
+| [`docs/modules.md`](./docs/modules.md)           | How to create and register a new module                         |
+| [`docs/frontend.md`](./docs/frontend.md)         | Inertia page resolver, Vue pages, flash, pagination, Pinia      |
+| [`docs/seeding.md`](./docs/seeding.md)           | Factory, seeder, and image caching flow                         |
 
 ---
 
@@ -162,13 +162,13 @@ php artisan test --parallel
 
 **Current coverage:**
 
-| Layer | File | Tests |
-|---|---|---|
-| Unit | `CarRepositoryTest` | list, show, insert, update, delete |
-| Unit | `CarServiceTest` | paginated list, show, edit, delete |
+| Layer   | File                | Tests                                         |
+|---------|---------------------|-----------------------------------------------|
+| Unit    | `CarRepositoryTest` | list, show, insert, update, delete            |
+| Unit    | `CarServiceTest`    | paginated list, show, edit, delete            |
 | Feature | `ListCarActionTest` | returns view, returns JSON, handles exception |
-| Feature | `ShowCarActionTest` | returns one car |
-| Feature | `EditCarActionTest` | in progress |
+| Feature | `ShowCarActionTest` | returns one car                               |
+| Feature | `EditCarActionTest` | in progress                                   |
 
 The test database uses an in-memory SQLite (`:memory:`) configured in `phpunit.xml`.
 
@@ -188,14 +188,14 @@ php artisan make:test-module ModuleName
 
 ## Available Routes
 
-| Method | URI | Response |
-|---|---|---|
-| GET | `/cars` | Inertia page (SPA) |
-| GET | `/cars/{id}` | Inertia page (SPA) |
-| PUT | `/cars/{id}` | Redirect |
-| DELETE | `/cars/{id}` | Redirect |
-| GET | `/api/cars` | JSON |
-| GET | `/api/cars/{id}` | JSON |
+| Method | URI              | Response           |
+|--------|------------------|--------------------|
+| GET    | `/cars`          | Inertia page (SPA) |
+| GET    | `/cars/{id}`     | Inertia page (SPA) |
+| PUT    | `/cars/{id}`     | Redirect           |
+| DELETE | `/cars/{id}`     | Redirect           |
+| GET    | `/api/cars`      | JSON               |
+| GET    | `/api/cars/{id}` | JSON               |
 
 ---
 

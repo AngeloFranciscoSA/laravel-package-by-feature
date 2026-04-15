@@ -23,13 +23,13 @@ Located at `database/factories/CarFactory.php`.
 
 Generates realistic car data using a curated catalog of real brands and models:
 
-| Field | Source |
-|---|---|
-| `brand` | Random key from the `$catalog` array (10 brands) |
-| `model` | Random model belonging to the selected brand |
-| `year` | Random integer between 2015–2025 |
-| `color` | Random from a list of PT-BR color names |
-| `price` | Random float between R$ 30,000 – R$ 350,000 |
+| Field       | Source                                                  |
+|-------------|---------------------------------------------------------|
+| `brand`     | Random key from the `$catalog` array (10 brands)        |
+| `model`     | Random model belonging to the selected brand            |
+| `year`      | Random integer between 2015–2025                        |
+| `color`     | Random from a list of PT-BR color names                 |
+| `price`     | Random float between R$ 30,000 – R$ 350,000             |
 | `image_url` | Set to `null` — assigned by the seeder via `sequence()` |
 
 **Note:** `image_url` is intentionally `null` in the factory. This means tests and manual `Car::factory()->create()` calls get `null`, and the Vue page falls back to a placeholder image. The real local URLs are only assigned when running `CarSeeder`.
