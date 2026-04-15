@@ -18,7 +18,7 @@ class CarServicesProvider extends ServiceProvider
     public function boot(): void
     {
         // Rotas para HTML -> Front-end
-        Route::prefix('')
+        Route::prefix('cars')
             ->group(__DIR__ . '/../Interfaces/Routes/web.php');
 
         // Rotas para API
