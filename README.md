@@ -31,6 +31,7 @@ Detailed docs are available in the [`/docs`](./docs) folder:
 | [`docs/modules.md`](./docs/modules.md)           | How to create and register a new module                         |
 | [`docs/frontend.md`](./docs/frontend.md)         | Inertia page resolver, Vue pages, flash, pagination, Pinia      |
 | [`docs/seeding.md`](./docs/seeding.md)           | Factory, seeder, and image caching flow                         |
+| [`docs/testing.md`](./docs/testing.md)           | Patterns for unit, feature and Inertia tests                    |
 
 ---
 
