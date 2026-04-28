@@ -2,6 +2,7 @@
 
 namespace Tests\Modules\Car\Feature\Actions;
 
+use App\Models\User;
 use App\Modules\Car\Interfaces\Http\Action\ListCarAction;
 use App\Modules\Car\Interfaces\Http\Requests\ListCarRequests;
 use App\Modules\Car\Models\Car;
@@ -26,14 +27,14 @@ class ListCarActionTest extends TestCase
 
     public function test_it_returns_view_when_request_does_not_want_json()
     {
+        $user = User::factory()->create();
         Car::factory()->count(3)->create();
 
-        // assertInertia() é a forma correta de testar respostas Inertia —
-        // vai via HTTP real e inspeciona o componente e props retornados.
-        $this->get('/cars')
+        $this->actingAs($user)
+            ->get('/cars')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Car/Index', false) // false = não verifica se o .vue existe no path padrão
+                ->component('Car/Index', false)
                 ->has('cars')
                 ->has('cars.data', 3)
             );
@@ -76,5 +77,10 @@ class ListCarActionTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(500, $response->getStatusCode());
         $this->assertEquals(['Erro', 123], $response->getData(true));
+    }
+
+    public function test_it_redirects_unauthenticated_user_to_login()
+    {
+        $this->get('/cars')->assertRedirect(route('auth.login'));
     }
 }
