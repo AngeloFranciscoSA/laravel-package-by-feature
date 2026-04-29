@@ -136,6 +136,17 @@ php artisan make:test-module <ModuleName>
 
 ---
 
+## Artisan commands for modules
+
+Two custom commands live in `app/Console/Commands/` and are the **primary entry points** for working with modules:
+
+| Command | File | Purpose |
+|---|---|---|
+| `php artisan make:module <ModuleName>` | `MakeModulesCommand.php` | Scaffold the full directory tree for a new module |
+| `php artisan make:test-module <ModuleName>` | `MakeTestModule.php` | Scaffold the test suite skeleton for an existing module |
+
+Always use these commands — never create module directories or test skeletons by hand.
+
 ## Adding a new module
 
 ```bash

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -5,8 +6,23 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 @source '../../app/Modules/**/Resources/Pages/**/*.vue';
+@source '../../app/Modules/**/Resources/Components/**/*.vue';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+:root {
+  --av-accent: #f07040;
+  --av-bg-page: #F8FAFC;
+  --av-bg-surface: #FFFFFF;
+  --av-border: #E2E8F0;
+  --av-border-light: #F1F5F9;
+  --av-text-primary: #0F172A;
+  --av-text-secondary: #64748B;
+  --av-text-muted: #94A3B8;
+  --av-text-faint: #CBD5E1;
+  --av-hero-from: #0F172A;
+  --av-hero-to: #1E3A5F;
 }

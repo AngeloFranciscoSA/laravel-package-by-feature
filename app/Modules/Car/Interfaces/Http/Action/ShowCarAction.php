@@ -2,13 +2,14 @@
 
 namespace App\Modules\Car\Interfaces\Http\Action;
 
-use App\Modules\Car\Interfaces\Http\Requests\ShowCarRequests;
 use App\Modules\Car\Services\CarService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class ShowCarAction
 {
@@ -19,20 +20,34 @@ class ShowCarAction
         $this->service = $service;
     }
 
-    public function __invoke(ShowCarRequests $request): JsonResponse|View
+    public function __invoke(Request $request, int $id): JsonResponse|\Illuminate\Http\RedirectResponse|\Inertia\Response
     {
         try {
-            $car = $this->service->showCar(id: $request->input('id'));
-            if($request->isJson()){
-                return response()->json($car, Response::HTTP_OK);
+            $car = $this->service->showCarWithSeller($id);
+            $seller = $car->seller;
+            $relatedCars = $seller ? $seller->cars->reject(fn($c) => $c->id === $car->id) : collect();
+
+            if ($request->wantsJson()) {
+                return response()->json($car->toArray(), SymfonyResponse::HTTP_OK);
             }
 
-            return view('car::show', compact('car'));
-        }catch (ModelNotFoundException $e){
-            return response()->json(['error' => 'Carro não encontrado.'], Response::HTTP_NOT_FOUND);
-        }
-        catch (Exception $exception){
-            return response()->json(['error' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return Inertia::render('Car/Detail', [
+                'car' => $car,
+                'relatedCars' => $relatedCars,
+                'seller' => $seller,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'Car not found.'], SymfonyResponse::HTTP_NOT_FOUND);
+            }
+
+            return redirect()->back()->withErrors(['error' => 'Car not found.']);
+        } catch (Exception $exception) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $exception->getMessage()], SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            return redirect()->back()->withErrors(['error' => $exception->getMessage()]);
         }
     }
 }

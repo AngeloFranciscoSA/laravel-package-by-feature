@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AutoVia — Buy & Sell Cars</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: 'Plus Jakarta Sans', sans-serif; background: #F8FAFC; color: #0F172A; }
+  #root { height: 100%; }
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #F1F5F9; } ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const CARS = [
+  { id: 1, brand: "Toyota", model: "Corolla Cross", year: 2023, price: 148900, km: 12000, fuel: "Hybrid", transmission: "Automatic", color: "White", city: "São Paulo", state: "SP", views: 3421, featured: true, badge: "Featured", img: null, seller: 1 },
+  { id: 2, brand: "Honda", model: "Civic", year: 2022, price: 132500, km: 28000, fuel: "Flex Fuel", transmission: "Automatic", color: "Black", city: "Rio de Janeiro", state: "RJ", views: 2891, featured: true, badge: "Top Viewed", img: null, seller: 2 },
+  { id: 3, brand: "Jeep", model: "Compass", year: 2023, price: 189000, km: 8500, fuel: "Flex Fuel", transmission: "Automatic", color: "Gray", city: "Curitiba", state: "PR", views: 2644, featured: true, badge: "Featured", img: null, seller: 3 },
+  { id: 4, brand: "Volkswagen", model: "T-Cross", year: 2022, price: 115000, km: 34000, fuel: "Flex Fuel", transmission: "Automatic", color: "Blue", city: "Belo Horizonte", state: "MG", views: 2210, featured: false, badge: null, img: null, seller: 1 },
+  { id: 5, brand: "Hyundai", model: "HB20", year: 2023, price: 82000, km: 5000, fuel: "Flex Fuel", transmission: "Manual", color: "Red", city: "Fortaleza", state: "CE", views: 1998, featured: false, badge: "New", img: null, seller: 4 },
+  { id: 6, brand: "Fiat", model: "Pulse", year: 2022, price: 98500, km: 41000, fuel: "Flex Fuel", transmission: "Automatic", color: "White", city: "Brasília", state: "DF", views: 1875, featured: false, badge: null, img: null, seller: 2 },
+  { id: 7, brand: "Chevrolet", model: "Onix Plus", year: 2023, price: 88000, km: 18000, fuel: "Flex Fuel", transmission: "Automatic", color: "Silver", city: "Porto Alegre", state: "RS", views: 1654, featured: false, badge: null, img: null, seller: 5 },
+  { id: 8, brand: "Renault", model: "Kwid", year: 2022, price: 62000, km: 29000, fuel: "Flex Fuel", transmission: "Manual", color: "Orange", city: "Recife", state: "PE", views: 1432, featured: false, badge: null, img: null, seller: 3 },
+  { id: 9, brand: "Toyota", model: "Hilux", year: 2021, price: 225000, km: 55000, fuel: "Diesel", transmission: "Automatic", color: "Black", city: "São Paulo", state: "SP", views: 1310, featured: false, badge: null, img: null, seller: 1 },
+  { id: 10, brand: "BMW", model: "320i", year: 2022, price: 310000, km: 22000, fuel: "Gasoline", transmission: "Automatic", color: "White", city: "São Paulo", state: "SP", views: 1200, featured: false, badge: "Premium", img: null, seller: 6 },
+  { id: 11, brand: "Ford", model: "Bronco Sport", year: 2023, price: 198000, km: 11000, fuel: "Gasoline", transmission: "Automatic", color: "Green", city: "Campinas", state: "SP", views: 980, featured: false, badge: null, img: null, seller: 4 },
+  { id: 12, brand: "Volkswagen", model: "Golf GTI", year: 2022, price: 245000, km: 19000, fuel: "Gasoline", transmission: "Automatic", color: "Red", city: "São Paulo", state: "SP", views: 892, featured: false, badge: "Premium", img: null, seller: 5 },
+];
+
+const SELLERS = {
+  1: { id: 1, name: "Carlos Mendes", avatar: null, city: "São Paulo", state: "SP", rating: 4.8, reviews: 34, cars: [1,4,9], since: "2021", phone: "(11) 99234-5678" },
+  2: { id: 2, name: "Ana Lima", avatar: null, city: "Rio de Janeiro", state: "RJ", rating: 4.6, reviews: 21, cars: [2,6], since: "2022", phone: "(21) 98876-1234" },
+  3: { id: 3, name: "Pedro Souza", avatar: null, city: "Curitiba", state: "PR", rating: 4.9, reviews: 47, cars: [3,8], since: "2020", phone: "(41) 99543-8765" },
+  4: { id: 4, name: "Mariana Ferreira", avatar: null, city: "Fortaleza", state: "CE", rating: 4.7, reviews: 15, cars: [5,11], since: "2023", phone: "(85) 98765-4321" },
+  5: { id: 5, name: "Lucas Costa", avatar: null, city: "Porto Alegre", state: "RS", rating: 4.5, reviews: 28, cars: [7,12], since: "2021", phone: "(51) 99321-6789" },
+  6: { id: 6, name: "Fernanda Oliveira", avatar: null, city: "São Paulo", state: "SP", rating: 5.0, reviews: 9, cars: [10], since: "2023", phone: "(11) 97654-3210" },
+};
+
+const BRANDS = ["All", "BMW", "Chevrolet", "Fiat", "Ford", "Honda", "Hyundai", "Jeep", "Renault", "Toyota", "Volkswagen"];
+const STATES = ["All", "CE", "DF", "MG", "PE", "PR", "RJ", "RS", "SP"];
+const FUELS = ["All", "Flex Fuel", "Gasoline", "Diesel", "Hybrid", "Electric"];
+const TRANSMISSIONS = ["All", "Automatic", "Manual"];
+const COLORS_LIST = ["All", "Blue", "White", "Gray", "Orange", "Black", "Silver", "Red", "Green"];
+
+const fmt = (n) => "R$ " + n.toLocaleString("en-US");
+const fmtKm = (n) => n.toLocaleString("en-US") + " km";
+
+// ─── CAR PLACEHOLDER ─────────────────────────────────────────────────────────
+const CAR_COLORS_MAP = { Toyota: "#E8F4FD", Honda: "#FEF3C7", Jeep: "#F0FDF4", Volkswagen: "#EFF6FF", Hyundai: "#FFF7ED", Fiat: "#F5F3FF", Chevrolet: "#FFF1F2", Renault: "#ECFEFF", BMW: "#F8FAFC", Ford: "#F0FDF4" };
+const CAR_TEXT_COLORS = { Toyota: "#0369A1", Honda: "#D97706", Jeep: "#15803D", Volkswagen: "#1D4ED8", Hyundai: "#C2410C", Fiat: "#7C3AED", Chevrolet: "#E11D48", Renault: "#0891B2", BMW: "#334155", Ford: "#15803D" };
+
+function CarPlaceholder({ car, height = 200 }) {
+  const bg = CAR_COLORS_MAP[car.brand] || "#F1F5F9";
+  const tc = CAR_TEXT_COLORS[car.brand] || "#475569";
+  return (
+    <div style={{ width: "100%", height, background: bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+      <svg width="72" height="44" viewBox="0 0 72 44" fill="none">
+        <rect x="8" y="20" width="56" height="16" rx="3" fill={tc} opacity="0.3"/>
+        <path d="M16 20 L22 8 L50 8 L56 20Z" fill={tc} opacity="0.4"/>
+        <circle cx="20" cy="36" r="6" fill={tc} opacity="0.6"/>
+        <circle cx="52" cy="36" r="6" fill={tc} opacity="0.6"/>
+        <rect x="24" y="10" width="10" height="8" rx="1" fill={tc} opacity="0.25"/>
+        <rect x="38" y="10" width="10" height="8" rx="1" fill={tc} opacity="0.25"/>
+      </svg>
+      <span style={{ fontSize: 11, fontWeight: 600, color: tc, opacity: 0.7, fontFamily: "monospace" }}>{car.brand} {car.model}</span>
+    </div>
+  );
+}
+
+// ─── NAVBAR ──────────────────────────────────────────────────────────────────
+function Navbar({ screen, setScreen, accent }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  return (
+    <nav style={{ background: "#fff", borderBottom: "1px solid #E2E8F0", position: "sticky", top: 0, zIndex: 100, padding: "0 24px" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
+        <button onClick={() => setScreen("home")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill={accent}/><path d="M7 18 L11 10 L17 10 L21 18Z" fill="white" opacity="0.9"/><circle cx="11" cy="18" r="2.5" fill="white"/><circle cx="18" cy="18" r="2.5" fill="white"/></svg>
+          <span style={{ fontWeight: 800, fontSize: 18, color: "#0F172A", letterSpacing: "-0.5px" }}>Auto<span style={{ color: accent }}>Via</span></span>
+        </button>
+        <div style={{ flex: 1 }} />
+        {["home","search","compare"].map(s => (
+          <button key={s} onClick={() => setScreen(s)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: screen === s ? 700 : 500, color: screen === s ? accent : "#64748B", borderBottom: screen === s ? `2px solid ${accent}` : "2px solid transparent", padding: "4px 0", height: 64, fontFamily: "inherit" }}>
+            {s === "home" ? "Home" : s === "search" ? "Search" : "Compare"}
+          </button>
+        ))}
+        <button onClick={() => setScreen("new-listing")} style={{ background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>+ List a Car</button>
+      </div>
+    </nav>
+  );
+}
+
+// ─── BADGE ───────────────────────────────────────────────────────────────────
+function Badge({ label, accent }) {
+  const colorMap = { "Featured": accent, "Top Viewed": "#F59E0B", "New": "#10B981", "Premium": "#8B5CF6" };
+  const bg = colorMap[label] || "#64748B";
+  return <span style={{ background: bg, color: "#fff", fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 4, letterSpacing: "0.3px" }}>{label}</span>;
+}
+
+// ─── CAR CARD ────────────────────────────────────────────────────────────────
+function CarCard({ car, onClick, accent, layout = "grid" }) {
+  const [fav, setFav] = useState(false);
+  const [hov, setHov] = useState(false);
+
+  if (layout === "list") {
+    return (
+      <div onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+        style={{ background: "#fff", borderRadius: 12, border: `1px solid ${hov ? accent + "40" : "#E2E8F0"}`, overflow: "hidden", cursor: "pointer", display: "flex", transition: "all 0.2s", boxShadow: hov ? "0 4px 20px rgba(0,0,0,0.08)" : "none" }}>
+        <div style={{ width: 220, flexShrink: 0, position: "relative" }}>
+          <CarPlaceholder car={car} height={140} />
+          {car.badge && <div style={{ position: "absolute", top: 10, left: 10 }}><Badge label={car.badge} accent={accent} /></div>}
+        </div>
+        <div style={{ padding: "16px 20px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>{car.brand} {car.model}</div>
+                <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{car.year} · {car.transmission} · {car.fuel}</div>
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: accent }}>{fmt(car.price)}</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+            <span style={{ fontSize: 13, color: "#94A3B8" }}>{fmtKm(car.km)}</span>
+            <span style={{ fontSize: 13, color: "#94A3B8" }}>{car.city}, {car.state}</span>
+            <span style={{ fontSize: 12, color: "#CBD5E1" }}>{car.views.toLocaleString()} views</span>
+          </div>
+        </div>
+        <button onClick={e => { e.stopPropagation(); setFav(!fav); }} style={{ background: "none", border: "none", cursor: "pointer", padding: "0 16px", color: fav ? "#EF4444" : "#CBD5E1", fontSize: 20 }}>
+          {fav ? "♥" : "♡"}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ background: "#fff", borderRadius: 14, border: `1px solid ${hov ? accent + "40" : "#E2E8F0"}`, overflow: "hidden", cursor: "pointer", transition: "all 0.2s", boxShadow: hov ? "0 8px 24px rgba(0,0,0,0.1)" : "0 1px 4px rgba(0,0,0,0.04)", transform: hov ? "translateY(-2px)" : "none" }}>
+      <div style={{ position: "relative" }}>
+        <CarPlaceholder car={car} height={180} />
+        {car.badge && <div style={{ position: "absolute", top: 10, left: 10 }}><Badge label={car.badge} accent={accent} /></div>}
+        <button onClick={e => { e.stopPropagation(); setFav(!fav); }} style={{ position: "absolute", top: 8, right: 8, background: "rgba(255,255,255,0.9)", border: "none", borderRadius: 50, width: 32, height: 32, cursor: "pointer", fontSize: 16, color: fav ? "#EF4444" : "#94A3B8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {fav ? "♥" : "♡"}
+        </button>
+      </div>
+      <div style={{ padding: "14px 16px" }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{car.brand} {car.model}</div>
+        <div style={{ fontSize: 12, color: "#94A3B8", margin: "3px 0 10px" }}>{car.year} · {fmtKm(car.km)} · {car.fuel}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: 17, fontWeight: 800, color: accent }}>{fmt(car.price)}</span>
+          <span style={{ fontSize: 12, color: "#CBD5E1" }}>{car.city}, {car.state}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── HOME SCREEN ─────────────────────────────────────────────────────────────
+function HomeScreen({ setScreen, setSelectedCar, accent, cardLayout }) {
+  const featured = CARS.filter(c => c.featured);
+  const mostViewed = [...CARS].sort((a, b) => b.views - a.views).slice(0, 6);
+  const others = CARS.filter(c => !c.featured).slice(0, 8);
+  const [search, setSearch] = useState("");
+  const [featIdx, setFeatIdx] = useState(0);
+
+  return (
+    <div>
+      {/* HERO */}
+      <div style={{ background: `linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%)`, padding: "64px 24px" }}>
+        <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: accent, textTransform: "uppercase", marginBottom: 12 }}>Car Marketplace</div>
+          <h1 style={{ fontSize: 42, fontWeight: 800, color: "#fff", lineHeight: 1.15, marginBottom: 16, letterSpacing: "-1px" }}>Buy and sell cars<br/><span style={{ color: accent }}>with confidence</span></h1>
+          <p style={{ color: "#94A3B8", fontSize: 16, marginBottom: 36 }}>Over 12,000 listings from private sellers across Brazil</p>
+          <div style={{ background: "#fff", borderRadius: 12, padding: 8, display: "flex", gap: 8, maxWidth: 560, margin: "0 auto", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by brand, model..." style={{ flex: 1, border: "none", outline: "none", fontSize: 15, padding: "8px 12px", background: "transparent", fontFamily: "inherit", color: "#0F172A" }} onKeyDown={e => e.key === "Enter" && setScreen("search")} />
+            <button onClick={() => setScreen("search")} style={{ background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontWeight: 700, cursor: "pointer", fontSize: 14, fontFamily: "inherit" }}>Search</button>
+          </div>
+          <div style={{ display: "flex", gap: 24, justifyContent: "center", marginTop: 28 }}>
+            {[["12k+", "Listings"], ["4.8★", "Rating"], ["98%", "Safety"]].map(([v, l]) => (
+              <div key={l} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>{v}</div>
+                <div style={{ fontSize: 12, color: "#64748B" }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px 64px" }}>
+        {/* FEATURED */}
+        <section style={{ marginTop: 48 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: "#0F172A" }}>Featured</h2>
+              <p style={{ color: "#64748B", fontSize: 14 }}>Handpicked for you</p>
+            </div>
+            <button onClick={() => setScreen("search")} style={{ background: "none", border: `1px solid ${accent}`, color: accent, borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>Ver todos →</button>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+            {featured.map(car => <CarCard key={car.id} car={car} accent={accent} layout={cardLayout} onClick={() => { setSelectedCar(car); setScreen("car-detail"); }} />)}
+          </div>
+        </section>
+
+        {/* MOST VIEWED */}
+        <section style={{ marginTop: 52 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: "#0F172A" }}>Maiores Visualizações</h2>
+              <p style={{ color: "#64748B", fontSize: 14 }}>Most searched this week</p>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+            {mostViewed.map((car, i) => (
+              <div key={car.id} style={{ position: "relative" }}>
+                <div style={{ position: "absolute", top: -10, left: -8, zIndex: 2, background: i < 3 ? accent : "#94A3B8", color: "#fff", borderRadius: 50, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>{i + 1}</div>
+                <CarCard car={car} accent={accent} layout={cardLayout} onClick={() => { setSelectedCar(car); setScreen("car-detail"); }} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* OTHER CARS */}
+        <section style={{ marginTop: 52 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: "#0F172A" }}>Mais Anúncios</h2>
+            <button onClick={() => setScreen("search")} style={{ background: "none", border: "none", color: accent, cursor: "pointer", fontSize: 14, fontWeight: 600, fontFamily: "inherit" }}>Ver todos →</button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {others.map(car => <CarCard key={car.id} car={car} accent={accent} layout="list" onClick={() => { setSelectedCar(car); setScreen("car-detail"); }} />)}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+// ─── SEARCH SCREEN ───────────────────────────────────────────────────────────
+function SearchScreen({ setScreen, setSelectedCar, accent, cardLayout }) {
+  const [filters, setFilters] = useState({ brand: "All", state: "All", fuel: "All", transmission: "All", color: "All", minPrice: "", maxPrice: "", minYear: "", maxYear: "", minKm: "", maxKm: "" });
+  const [sortBy, setSortBy] = useState("views");
+  const [viewMode, setViewMode] = useState(cardLayout === "list" ? "list" : "grid");
+
+  const setF = (k, v) => setFilters(f => ({ ...f, [k]: v }));
+
+  const filtered = CARS.filter(c => {
+    if (filters.brand !== "All" && c.brand !== filters.brand) return false;
+    if (filters.state !== "All" && c.state !== filters.state) return false;
+    if (filters.fuel !== "All" && c.fuel !== filters.fuel) return false;
+    if (filters.transmission !== "All" && c.transmission !== filters.transmission) return false;
+    if (filters.color !== "All" && c.color !== filters.color) return false;
+    if (filters.minPrice && c.price < Number(filters.minPrice)) return false;
+    if (filters.maxPrice && c.price > Number(filters.maxPrice)) return false;
+    if (filters.minYear && c.year < Number(filters.minYear)) return false;
+    if (filters.maxYear && c.year > Number(filters.maxYear)) return false;
+    if (filters.minKm && c.km < Number(filters.minKm)) return false;
+    if (filters.maxKm && c.km > Number(filters.maxKm)) return false;
+    return true;
+  }).sort((a, b) => sortBy === "price-asc" ? a.price - b.price : sortBy === "price-desc" ? b.price - a.price : sortBy === "year" ? b.year - a.year : b.views - a.views);
+
+  const inputStyle = { width: "100%", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px 10px", fontSize: 13, fontFamily: "inherit", outline: "none", color: "#0F172A", background: "#fff" };
+  const labelStyle = { fontSize: 12, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 4 };
+
+  return (
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px" }}>
+      <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 24 }}>Buscar Carros</h1>
+      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 32 }}>
+        {/* FILTERS SIDEBAR */}
+        <aside>
+          <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 14, padding: 20, position: "sticky", top: 80 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 20, color: "#0F172A" }}>Filtros</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {[["brand","Brand", BRANDS], ["state","State", STATES], ["fuel","Fuel", FUELS], ["transmission","Transmission", TRANSMISSIONS], ["color","Color", COLORS_LIST]].map(([key, label, opts]) => (
+                <div key={key}>
+                  <label style={labelStyle}>{label}</label>
+                  <select value={filters[key]} onChange={e => setF(key, e.target.value)} style={inputStyle}>
+                    {opts.map(o => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+              ))}
+              <div>
+                <label style={labelStyle}>Preço (R$)</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input value={filters.minPrice} onChange={e => setF("minPrice", e.target.value)} placeholder="Min" style={{ ...inputStyle, width: "50%" }} />
+                  <input value={filters.maxPrice} onChange={e => setF("maxPrice", e.target.value)} placeholder="Max" style={{ ...inputStyle, width: "50%" }} />
+                </div>
+              </div>
+              <div>
+                <label style={labelStyle}>Ano</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input value={filters.minYear} onChange={e => setF("minYear", e.target.value)} placeholder="From" style={{ ...inputStyle, width: "50%" }} />
+                  <input value={filters.maxYear} onChange={e => setF("maxYear", e.target.value)} placeholder="To" style={{ ...inputStyle, width: "50%" }} />
+                </div>
+              </div>
+              <div>
+                <label style={labelStyle}>Km</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input value={filters.minKm} onChange={e => setF("minKm", e.target.value)} placeholder="Min" style={{ ...inputStyle, width: "50%" }} />
+                  <input value={filters.maxKm} onChange={e => setF("maxKm", e.target.value)} placeholder="Máx" style={{ ...inputStyle, width: "50%" }} />
+                </div>
+              </div>
+              <button onClick={() => setFilters({ brand: "All", state: "All", fuel: "All", transmission: "All", color: "All", minPrice: "", maxPrice: "", minYear: "", maxYear: "", minKm: "", maxKm: "" })} style={{ background: "#F1F5F9", color: "#64748B", border: "none", borderRadius: 8, padding: "10px", fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Limpar filtros</button>
+            </div>
+          </div>
+        </aside>
+
+        {/* RESULTS */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <span style={{ fontSize: 14, color: "#64748B" }}><strong style={{ color: "#0F172A" }}>{filtered.length}</strong> cars found</span>
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ ...inputStyle, width: "auto", padding: "6px 10px" }}>
+                <option value="views">Most viewed</option>
+                <option value="price-asc">Lowest price</option>
+                <option value="price-desc">Highest price</option>
+                <option value="year">Newest</option>
+              </select>
+              <div style={{ display: "flex", gap: 4, background: "#F1F5F9", borderRadius: 8, padding: 3 }}>
+                {[["grid","⊞"], ["list","☰"]].map(([m,i]) => (
+                  <button key={m} onClick={() => setViewMode(m)} style={{ background: viewMode === m ? "#fff" : "none", border: "none", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 16, boxShadow: viewMode === m ? "0 1px 3px rgba(0,0,0,0.1)" : "none" }}>{i}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+          {viewMode === "grid" ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+              {filtered.map(car => <CarCard key={car.id} car={car} accent={accent} layout="grid" onClick={() => { setSelectedCar(car); setScreen("car-detail"); }} />)}
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {filtered.map(car => <CarCard key={car.id} car={car} accent={accent} layout="list" onClick={() => { setSelectedCar(car); setScreen("car-detail"); }} />)}
+            </div>
+          )}
+          {filtered.length === 0 && (
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#94A3B8" }}>
+              <div style={{ fontSize: 40 }}>🔍</div>
+              <div style={{ marginTop: 12, fontWeight: 600 }}>Nenhum carro encontrado</div>
+              <div style={{ fontSize: 14, marginTop: 4 }}>Tente ajustar os filtros</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── CAR DETAIL SCREEN ───────────────────────────────────────────────────────
+function CarDetailScreen({ car, setScreen, setSelectedSeller, accent }) {
+  const seller = SELLERS[car.seller];
+  const related = CARS.filter(c => c.brand === car.brand && c.id !== car.id).slice(0, 3);
+  const [tab, setTab] = useState("details");
+  const [contacted, setContacted] = useState(false);
+
+  const spec = (label, value) => (
+    <div style={{ padding: "12px 0", borderBottom: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between" }}>
+      <span style={{ fontSize: 14, color: "#64748B" }}>{label}</span>
+      <span style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>{value}</span>
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px" }}>
+      <button onClick={() => setScreen("search")} style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", fontSize: 14, marginBottom: 20, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>← Voltar</button>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 32 }}>
+        {/* MAIN */}
+        <div>
+          <div style={{ background: "#fff", borderRadius: 14, overflow: "hidden", border: "1px solid #E2E8F0", marginBottom: 20 }}>
+            <CarPlaceholder car={car} height={360} />
+          </div>
+          {/* TABS */}
+          <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", overflow: "hidden" }}>
+            <div style={{ display: "flex", borderBottom: "1px solid #E2E8F0" }}>
+              {["details","specs"].map(t => (
+                <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "14px", background: "none", border: "none", cursor: "pointer", fontWeight: tab === t ? 700 : 500, color: tab === t ? accent : "#64748B", borderBottom: tab === t ? `2px solid ${accent}` : "2px solid transparent", fontSize: 14, fontFamily: "inherit" }}>
+                  {t === "details" ? "Details" : "Specifications"}
+                </button>
+              ))}
+            </div>
+            <div style={{ padding: 24 }}>
+              {tab === "details" ? (
+                <div>
+                  {spec("Brand", car.brand)}
+                  {spec("Model", car.model)}
+                  {spec("Year", car.year)}
+                  {spec("Mileage", fmtKm(car.km))}
+                  {spec("Fuel", car.fuel)}
+                  {spec("Transmission", car.transmission)}
+                  {spec("Color", car.color)}
+                  {spec("Location", `${car.city}, ${car.state}`)}
+                </div>
+              ) : (
+                <div>
+                  {spec("Engine", "2.0 16V DOHC")}
+                  {spec("Power", "170 cv")}
+                  {spec("Torque", "20,4 kgfm")}
+                  {spec("0–100 km/h", "8,5s")}
+                  {spec("Top Speed", "210 km/h")}
+                  {spec("City Fuel Economy", "12,5 km/l")}
+                  {spec("Steering", "Electric")}
+                  {spec("Doors", "4")}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* SIDEBAR */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 14, padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "#0F172A" }}>{car.brand} {car.model}</div>
+                <div style={{ fontSize: 14, color: "#64748B" }}>{car.year} · {fmtKm(car.km)}</div>
+              </div>
+              {car.badge && <Badge label={car.badge} accent={accent} />}
+            </div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: accent, margin: "16px 0" }}>{fmt(car.price)}</div>
+            <div style={{ fontSize: 12, color: "#CBD5E1", marginBottom: 16 }}>{car.views.toLocaleString()} views</div>
+            <button onClick={() => setContacted(true)} style={{ width: "100%", background: contacted ? "#10B981" : accent, color: "#fff", border: "none", borderRadius: 10, padding: "14px", fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "inherit", marginBottom: 8 }}>
+              {contacted ? "✓ Message Sent!" : "Contact Seller"}
+            </button>
+            <button style={{ width: "100%", background: "#F1F5F9", color: "#0F172A", border: "none", borderRadius: 10, padding: "12px", fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>
+              📞 Ver telefone
+            </button>
+          </div>
+
+          {/* SELLER CARD */}
+          <div onClick={() => { setSelectedSeller(seller); setScreen("seller"); }} style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 14, padding: 20, cursor: "pointer" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>Anunciante</div>
+            <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 50, background: `${accent}20`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: accent }}>{seller.name.charAt(0)}</div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 15 }}>{seller.name}</div>
+                <div style={{ fontSize: 13, color: "#94A3B8" }}>{seller.city}, {seller.state}</div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 16 }}>
+              <span style={{ fontSize: 13, color: "#64748B" }}>⭐ {seller.rating}</span>
+              <span style={{ fontSize: 13, color: "#64748B" }}>{seller.reviews} reviews</span>
+            </div>
+          </div>
+
+          {/* RELATED */}
+          {related.length > 0 && (
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A", marginBottom: 12 }}>Outros {car.brand}</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {related.map(rc => (
+                  <div key={rc.id} onClick={() => setScreen("car-detail")} style={{ background: "#fff", borderRadius: 10, border: "1px solid #E2E8F0", padding: 12, cursor: "pointer", display: "flex", gap: 10, alignItems: "center" }}>
+                    <div style={{ width: 60, height: 42, borderRadius: 6, overflow: "hidden", flexShrink: 0 }}><CarPlaceholder car={rc} height={42} /></div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>{rc.model} {rc.year}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: accent }}>{fmt(rc.price)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SELLER PROFILE SCREEN ───────────────────────────────────────────────────
+function SellerScreen({ seller, setScreen, setSelectedCar, accent }) {
+  const cars = CARS.filter(c => seller.cars.includes(c.id));
+  return (
+    <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px" }}>
+      <button onClick={() => setScreen("search")} style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", fontSize: 14, marginBottom: 24, fontFamily: "inherit" }}>← Voltar</button>
+      <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", overflow: "hidden", marginBottom: 24 }}>
+        <div style={{ background: `linear-gradient(135deg, ${accent}15, ${accent}05)`, padding: "32px 32px 24px" }}>
+          <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
+            <div style={{ width: 80, height: 80, borderRadius: 50, background: `${accent}20`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 800, color: accent }}>{seller.name.charAt(0)}</div>
+            <div>
+              <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{seller.name}</h1>
+              <div style={{ color: "#64748B", marginTop: 4 }}>{seller.city}, {seller.state} · Member since {seller.since}</div>
+              <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
+                <span style={{ fontSize: 14 }}>⭐ <strong>{seller.rating}</strong> ({seller.reviews} reviews)</span>
+                <span style={{ fontSize: 14, color: "#64748B" }}>{cars.length} active listings</span>
+              </div>
+            </div>
+            <div style={{ marginLeft: "auto" }}>
+              <button style={{ background: accent, color: "#fff", border: "none", borderRadius: 10, padding: "12px 24px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Contato</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Anúncios de {seller.name}</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        {cars.map(car => <CarCard key={car.id} car={car} accent={accent} layout="grid" onClick={() => { setSelectedCar(car); setScreen("car-detail"); }} />)}
+      </div>
+    </div>
+  );
+}
+
+// ─── NEW LISTING FORM ────────────────────────────────────────────────────────
+function NewListingScreen({ setScreen, accent }) {
+  const [step, setStep] = useState(1);
+  const [form, setForm] = useState({ brand: "", model: "", year: "", price: "", km: "", fuel: "Flex Fuel", transmission: "Automatic", color: "", state: "", city: "", description: "", name: "", phone: "", email: "" });
+  const setF = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const inputStyle = { width: "100%", border: "1px solid #E2E8F0", borderRadius: 8, padding: "10px 12px", fontSize: 14, fontFamily: "inherit", outline: "none", color: "#0F172A", background: "#fff", transition: "border 0.2s" };
+  const labelStyle = { fontSize: 13, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 6 };
+  const field = (label, key, type = "text", opts = null) => (
+    <div>
+      <label style={labelStyle}>{label}</label>
+      {opts ? (
+        <select value={form[key]} onChange={e => setF(key, e.target.value)} style={inputStyle}><option value="">Selecione</option>{opts.map(o => <option key={o}>{o}</option>)}</select>
+      ) : (
+        <input type={type} value={form[key]} onChange={e => setF(key, e.target.value)} style={inputStyle} />
+      )}
+    </div>
+  );
+
+  const steps = ["Vehicle", "Pricing", "Contact", "Review"];
+
+  return (
+    <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 24px" }}>
+      <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8 }}>Novo Anúncio</h1>
+      <p style={{ color: "#64748B", fontSize: 14, marginBottom: 32 }}>Preencha os dados do seu veículo</p>
+
+      {/* STEPPER */}
+      <div style={{ display: "flex", gap: 0, marginBottom: 40, position: "relative" }}>
+        <div style={{ position: "absolute", top: 16, left: "12.5%", right: "12.5%", height: 2, background: "#E2E8F0", zIndex: 0 }} />
+        <div style={{ position: "absolute", top: 16, left: "12.5%", width: `${((step - 1) / 3) * 75}%`, height: 2, background: accent, zIndex: 1, transition: "width 0.4s" }} />
+        {steps.map((s, i) => (
+          <div key={s} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, position: "relative", zIndex: 2 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 50, background: i + 1 <= step ? accent : "#fff", border: `2px solid ${i + 1 <= step ? accent : "#E2E8F0"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: i + 1 <= step ? "#fff" : "#94A3B8", transition: "all 0.3s" }}>
+              {i + 1 < step ? "✓" : i + 1}
+            </div>
+            <span style={{ fontSize: 12, fontWeight: step === i + 1 ? 700 : 500, color: step === i + 1 ? accent : "#94A3B8" }}>{s}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: 32 }}>
+        {step === 1 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Dados do Veículo</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              {field("Brand", "brand", "text", BRANDS.slice(1))}
+              {field("Model", "model")}
+              {field("Year", "year", "number")}
+              {field("Mileage", "km", "number")}
+              {field("Fuel Type", "fuel", "text", FUELS.slice(1))}
+              {field("Transmission", "transmission", "text", TRANSMISSIONS.slice(1))}
+              {field("Color", "color", "text", COLORS_LIST.slice(1))}
+            </div>
+          </div>
+        )}
+        {step === 2 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Valores e Localização</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div style={{ gridColumn: "span 2" }}>{field("Price (R$)", "price", "number")}</div>
+              {field("State", "state", "text", STATES.slice(1))}
+              {field("City", "city")}
+            </div>
+            <div>
+              <label style={labelStyle}>Descrição</label>
+              <textarea value={form.description} onChange={e => setF("description", e.target.value)} rows={4} style={{ ...inputStyle, resize: "vertical" }} placeholder="Describe the vehicle condition, accessories, history..." />
+            </div>
+          </div>
+        )}
+        {step === 3 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Seus Dados de Contato</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {field("Full name", "name")}
+              {field("Phone / WhatsApp", "phone")}
+              {field("Email", "email", "email")}
+            </div>
+          </div>
+        )}
+        {step === 4 && (
+          <div>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Revisar Anúncio</h2>
+            <div style={{ background: "#F8FAFC", borderRadius: 12, padding: 20, marginBottom: 20 }}>
+              <CarPlaceholder car={{ brand: form.brand || "Your", model: form.model || "Car" }} height={160} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {[["Brand/Model", `${form.brand} ${form.model}`], ["Year", form.year], ["Mileage", form.km ? fmtKm(Number(form.km)) : "—"], ["Price", form.price ? fmt(Number(form.price)) : "—"], ["Fuel", form.fuel], ["Transmission", form.transmission], ["Location", `${form.city}, ${form.state}`]].map(([k, v]) => (
+                <div key={k} style={{ padding: "8px 0", borderBottom: "1px solid #F1F5F9" }}>
+                  <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{k}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", marginTop: 2 }}>{v || "—"}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 28 }}>
+          <button onClick={() => step > 1 ? setStep(s => s - 1) : setScreen("home")} style={{ background: "#F1F5F9", color: "#64748B", border: "none", borderRadius: 10, padding: "12px 24px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+            {step === 1 ? "Cancel" : "← Back"}
+          </button>
+          <button onClick={() => step < 4 ? setStep(s => s + 1) : alert("Listing published successfully! 🎉")} style={{ background: accent, color: "#fff", border: "none", borderRadius: 10, padding: "12px 32px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 15 }}>
+            {step === 4 ? "Publish listing ✓" : "Next →"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── COMPARE SCREEN ──────────────────────────────────────────────────────────
+function CompareScreen({ setScreen, setSelectedCar, accent }) {
+  const [selected, setSelected] = useState([CARS[0], CARS[1], null]);
+  const [picking, setPicking] = useState(null);
+
+  const toggleCar = (slot, car) => {
+    setSelected(s => { const n = [...s]; n[slot] = car; return n; });
+    setPicking(null);
+  };
+
+  const cols = selected.filter(Boolean);
+  const allSpecs = [["Price", c => fmt(c.price), true], ["Year", c => c.year, false], ["Mileage", c => fmtKm(c.km), false], ["Fuel", c => c.fuel, false], ["Transmission", c => c.transmission, false], ["Color", c => c.color, false], ["Location", c => `${c.city}, ${c.state}`, false]];
+
+  const bestPrice = cols.length > 1 ? Math.min(...cols.map(c => c.price)) : null;
+  const bestKm = cols.length > 1 ? Math.min(...cols.map(c => c.km)) : null;
+  const bestYear = cols.length > 1 ? Math.max(...cols.map(c => c.year)) : null;
+
+  const isWinner = (car, key) => {
+    if (cols.length < 2) return false;
+    if (key === "price") return car.price === bestPrice;
+    if (key === "km") return car.km === bestKm;
+    if (key === "year") return car.year === bestYear;
+    return false;
+  };
+
+  return (
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+      <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6 }}>Comparar Carros</h1>
+      <p style={{ color: "#64748B", fontSize: 14, marginBottom: 28 }}>Selecione até 3 carros para comparar lado a lado</p>
+
+      {/* CAR PICKER MODAL */}
+      {picking !== null && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setPicking(null)}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: 24, maxWidth: 560, width: "90%", maxHeight: "70vh", overflow: "auto" }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Escolha um carro</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {CARS.map(car => (
+                <div key={car.id} onClick={() => toggleCar(picking, car)} style={{ display: "flex", gap: 12, alignItems: "center", padding: 12, borderRadius: 10, border: "1px solid #E2E8F0", cursor: "pointer", background: selected.includes(car) ? `${accent}10` : "#fff" }}>
+                  <div style={{ width: 64, height: 44, borderRadius: 6, overflow: "hidden" }}><CarPlaceholder car={car} height={44} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{car.brand} {car.model} {car.year}</div>
+                    <div style={{ fontSize: 13, color: "#64748B" }}>{fmtKm(car.km)}</div>
+                  </div>
+                  <div style={{ fontWeight: 700, color: accent }}>{fmt(car.price)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "160px repeat(3, 1fr)", gap: 12 }}>
+        {/* HEADER ROW */}
+        <div />
+        {[0,1,2].map(slot => (
+          <div key={slot} style={{ background: "#fff", borderRadius: 14, border: `2px solid ${selected[slot] ? "#E2E8F0" : "#F1F5F9"}`, overflow: "hidden" }}>
+            {selected[slot] ? (
+              <div>
+                <CarPlaceholder car={selected[slot]} height={140} />
+                <div style={{ padding: "12px 14px" }}>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{selected[slot].brand} {selected[slot].model}</div>
+                  <div style={{ fontSize: 12, color: "#94A3B8", margin: "4px 0 8px" }}>{selected[slot].year}</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <button onClick={() => { setSelectedCar(selected[slot]); setScreen("car-detail"); }} style={{ background: accent, color: "#fff", border: "none", borderRadius: 6, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Ver</button>
+                    <button onClick={() => toggleCar(slot, null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94A3B8", fontSize: 18 }}>×</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setPicking(slot)} style={{ width: "100%", height: 200, background: "#F8FAFC", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "#94A3B8", fontFamily: "inherit" }}>
+                <div style={{ width: 40, height: 40, borderRadius: 50, border: `2px dashed ${accent}`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, fontSize: 20 }}>+</div>
+                <span style={{ fontSize: 13, fontWeight: 500 }}>Adicionar carro</span>
+              </button>
+            )}
+          </div>
+        ))}
+
+        {/* SPEC ROWS */}
+        {allSpecs.map(([label, getValue, isPrice]) => (
+          <React.Fragment key={label}>
+            <div style={{ display: "flex", alignItems: "center", fontSize: 13, fontWeight: 600, color: "#64748B", paddingLeft: 4 }}>{label}</div>
+            {[0,1,2].map(slot => {
+              const car = selected[slot];
+              const key = label === "Price" ? "price" : label === "Mileage" ? "km" : label === "Year" ? "year" : null;
+              const winner = car && key ? isWinner(car, key) : false;
+              return (
+                <div key={slot} style={{ background: winner ? `${accent}12` : "#fff", borderRadius: 8, padding: "12px 14px", fontSize: 14, fontWeight: winner ? 700 : 500, color: winner ? accent : "#0F172A", border: `1px solid ${winner ? accent + "30" : "#F1F5F9"}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  {car ? getValue(car) : <span style={{ color: "#E2E8F0" }}>—</span>}
+                  {winner && <span style={{ fontSize: 11, background: accent, color: "#fff", borderRadius: 4, padding: "2px 6px", fontWeight: 700 }}>✓</span>}
+                </div>
+              );
+            })}
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── TWEAKS DEFAULTS ─────────────────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentColor": "#f07040",
+  "cardLayout": "grid",
+  "cardRadius": 12,
+  "fontScale": 1
+}/*EDITMODE-END*/;
+
+// ─── APP ROOT ────────────────────────────────────────────────────────────────
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [screen, setScreen] = useState("home");
+  const [selectedCar, setSelectedCar] = useState(CARS[0]);
+  const [selectedSeller, setSelectedSeller] = useState(SELLERS[1]);
+
+  const accent = tweaks.accentColor;
+  const cardLayout = tweaks.cardLayout;
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#F8FAFC", fontSize: `${tweaks.fontScale}em` }}>
+      <Navbar screen={screen} setScreen={setScreen} accent={accent} />
+      {screen === "home" && <HomeScreen setScreen={setScreen} setSelectedCar={setSelectedCar} accent={accent} cardLayout={cardLayout} />}
+      {screen === "search" && <SearchScreen setScreen={setScreen} setSelectedCar={setSelectedCar} accent={accent} cardLayout={cardLayout} />}
+      {screen === "car-detail" && <CarDetailScreen car={selectedCar} setScreen={setScreen} setSelectedSeller={setSelectedSeller} accent={accent} />}
+      {screen === "seller" && <SellerScreen seller={selectedSeller} setScreen={setScreen} setSelectedCar={setSelectedCar} accent={accent} />}
+      {screen === "new-listing" && <NewListingScreen setScreen={setScreen} accent={accent} />}
+      {screen === "compare" && <CompareScreen setScreen={setScreen} setSelectedCar={setSelectedCar} accent={accent} />}
+
+      <TweaksPanel title="Tweaks — AutoVia">
+        <TweakColor id="accentColor" label="Accent color" value={tweaks.accentColor} onChange={v => setTweak("accentColor", v)} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+          {[["#f04747","Red"],["#f07040","Orange"],["#e6b800","Amber"],["#3B82F6","Blue"],["#10B981","Green"],["#8B5CF6","Purple"],["#EC4899","Pink"],["#0F172A","Slate"]].map(([c, name]) => (
+            <button key={c} title={name} onClick={() => setTweak("accentColor", c)} style={{ width: 24, height: 24, borderRadius: "50%", background: c, border: tweaks.accentColor === c ? "2px solid #0F172A" : "2px solid transparent", outline: tweaks.accentColor === c ? "2px solid " + c : "none", outlineOffset: 1, cursor: "pointer", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+          ))}
+        </div>
+        <TweakRadio id="cardLayout" label="Card layout" value={tweaks.cardLayout} onChange={v => setTweak("cardLayout", v)} options={[{ label: "Grid", value: "grid" }, { label: "List", value: "list" }]} />
+        <TweakSlider id="cardRadius" label="Card radius" min={0} max={24} step={2} value={tweaks.cardRadius} onChange={v => setTweak("cardRadius", v)} />
+        <TweakSlider id="fontScale" label="Font scale" min={0.85} max={1.15} step={0.05} value={tweaks.fontScale} onChange={v => setTweak("fontScale", v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

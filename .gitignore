@@ -26,3 +26,5 @@ Thumbs.db
 _ide_helper.php
 .phpstorm.meta.php/
 qodana.*
+
+.deepseek-usage.jsonl
