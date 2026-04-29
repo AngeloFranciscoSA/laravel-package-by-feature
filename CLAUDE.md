@@ -176,26 +176,123 @@ This scaffolds the full directory tree. After running it:
 
 ## Code generation with deepseek-coder MCP
 
-When implementing a new Action, Service, Repository, or test class, delegate the
-code writing to the `deepseek-coder` MCP tool (`generate_and_write`).
+All new module code must be written via the `deepseek-coder` MCP. Never write
+module implementation code inline.
 
-**Workflow:**
-1. Read an existing analogous file with `read_file` to use as context.
-2. Call `generate_and_write` with precise instructions that include:
-    - Class name, namespace, and file path relative to the project root.
-    - Constructor dependencies and their types.
-    - Method signatures with parameter and return types.
-    - Business rules or edge cases to handle.
-    - Which patterns from this project to follow (e.g., "follow the same structure as `CarService`").
-3. For complex business logic or non-trivial algorithms, pass `model: "deepseek-reasoner"`.
-   For straightforward CRUD, `model: "deepseek-coder"` (default) is sufficient.
+### Session startup (required)
 
-**Example instruction to deepseek-coder:**
-> "Create a Laravel 12 invokable controller at `app/Modules/Brand/Interfaces/Http/Action/ListBrandAction.php`
-> in namespace `App\Modules\Brand\Interfaces\Http\Action`.
-> Inject `BrandService $service` via constructor.
-> The `__invoke(Request $request)` method calls `$this->service->paginate(15)`,
-> then returns a view `brand.index` with the result, or a JsonResource collection
-> if `$request->wantsJson()`. Follow the same structure as `ListCarAction`."
+At the start of every coding session, call `init_project_context` with the key
+reference files so DeepSeek has project context without it being repeated in
+every instruction:
 
-Do not write new module code inline — always delegate to the MCP tool.
+```
+init_project_context([
+  "CLAUDE.md",
+  "app/Modules/Car/Services/CarService.php",
+  "app/Modules/Car/Repositories/CarRepository.php"
+])
+```
+
+Then register recurring patterns once:
+
+```
+register_pattern("laravel-invokable-action", "
+  Invokable controller in namespace App\Modules\{Module}\Interfaces\Http\Action.
+  Constructor injects {Module}Service.
+  __invoke(Request $request): Response|JsonResponse
+  Checks wantsJson() for content negotiation.
+  Delegates all logic to the service — never touches the repository directly.
+")
+
+register_pattern("laravel-repository", "
+  Implements {Module}RepositoryInterface.
+  Constructor type-hints the Eloquent Model.
+  All queries via Eloquent — no raw SQL.
+  Returns typed values (Model, Collection, LengthAwarePaginator).
+")
+```
+
+### Tool selection rules
+
+| Situation | Tool to use |
+|---|---|
+| 2+ related files (same layer) | `generate_and_write_multiple` |
+| 1 file, new or full rewrite | `generate_and_write` |
+| Small change to existing file | `patch_file` |
+| Need to inspect code before saving | `generate_code` then `write_file` |
+| Never | `generate_code` + `write_file` as separate steps for the same file |
+
+### Grouping strategy — always group by architectural layer
+
+Never generate one file per API call. Group files by layer to minimise calls:
+
+```
+Call 1: Migration(s)
+Call 2: Model + RepositoryInterface + Repository
+Call 3: Service + ServiceProvider
+Call 4: All Actions for the module
+Call 5: FormRequests + route files
+```
+
+Target: 5 calls or fewer per module, regardless of how many files.
+
+### Context rules
+
+- Call `read_file` for a reference file **at most once per session**.
+- After reading, pass the content via the `context` parameter in subsequent
+  calls — never call `read_file` again for the same file.
+- Use `shared_context` in `generate_and_write_multiple` for content that
+  applies to all files in the batch (e.g. an interface all repositories must
+  implement).
+
+### Model selection
+
+| Task | Model |
+|---|---|
+| CRUD, boilerplate, standard patterns | `deepseek-v4-flash` (default) |
+| Complex business logic, algorithms | `deepseek-v4-pro` |
+
+### Context management
+
+Before any task that will generate 5+ files:
+- Run `/compact` if the conversation already has accumulated history (> 20k tokens).
+- Run `/clear` if the new task is completely independent of the current conversation.
+
+### End of session
+
+Always call `usage_summary` at the end of a session to log token consumption
+and confirm estimated cost.
+
+### Example — implementing a new Brand module
+
+```
+# 1. Already done at session start: init_project_context + register_pattern
+
+# 2. Scaffold directory tree
+php artisan make:module Brand
+
+# 3. Generate all backend files in 3 calls
+
+generate_and_write_multiple(files=[
+  { "file_path": "app/Modules/Brand/Models/Brand.php",
+    "instructions": "Eloquent model. fillable: name, slug. HasMany Car." },
+  { "file_path": "app/Modules/Brand/Repositories/Contracts/BrandRepositoryInterface.php",
+    "instructions": "Interface: all(Collection), find(int): ?Brand, paginate(int): LengthAwarePaginator" },
+  { "file_path": "app/Modules/Brand/Repositories/BrandRepository.php",
+    "instructions": "Implements BrandRepositoryInterface. Follow laravel-repository pattern." },
+], shared_context="<Brand module, same conventions as Car module>", pattern="laravel-repository")
+
+generate_and_write(
+  file_path="app/Modules/Brand/Services/BrandService.php",
+  instructions="Inject BrandRepositoryInterface. Methods: all(), paginate(15), find(int).",
+)
+
+generate_and_write_multiple(files=[
+  { "file_path": "app/Modules/Brand/Interfaces/Http/Action/ListBrandAction.php",
+    "instructions": "paginate(15), returns brand.index view or JsonResource. Follow laravel-invokable-action pattern." },
+  { "file_path": "app/Modules/Brand/Interfaces/Http/Action/ShowBrandAction.php",
+    "instructions": "find(id), 404 if null, returns brand.show or JsonResource." },
+  { "file_path": "app/Modules/Brand/Interfaces/Routes/web.php",
+    "instructions": "GET /brands -> ListBrandAction, GET /brands/{id} -> ShowBrandAction." },
+])
+```
